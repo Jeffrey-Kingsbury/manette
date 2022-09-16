@@ -1,9 +1,9 @@
 # Manette
-Final Project for Concordia Bootcamp 
+## Final Project for Concordia Bootcamp by Jeffrey Kingsbury
 
 Manette is a bug tracking application designed for the quality assurance domain.
-
-Users will be able to:
+#
+## Users will be able to:
 * Create tickets 
 * Edit tickets
 * Search
@@ -15,8 +15,8 @@ Users will be able to:
 * Recover passwords via email
 * Create new projects with different permission levels (public / private)
 
-
-Stretch goals: 
+#
+## Stretch goals: 
 * 2FA 
 * Custom themes
 * Greater details in profiles
@@ -27,3 +27,21 @@ Stretch goals:
 * Exporting individual ticket or whole project datas to CSV or PDF
 * Custom severities 
 * Custom componenets (ex: UI/UX, Frontend, Backend) when creating tickets
+
+#
+# Tech used:
+#### Frontend
+* React
+* React styled componenets
+* React icons
+* Images from Unsplash
+
+#### Backend
+* Express
+* Bcrypt
+* Body-parser
+* Cookie-Parser
+* Multer
+* NodemMailer
+* UUID
+* JsonWebToken
