@@ -3,10 +3,26 @@ import bg from "../images/pastel_bg.jpg";
 import logo from "../images/manette_logo.png";
 import Input from './Input';
 import { useState } from 'react';
+import ColorButton from './ColorButton';
 
 const Login = () => {
     const [userValue, setUserValue] = useState(null);
     const [passValue, setPassValue] = useState(null);
+
+    const handleLogin = async () => {
+        await fetch('/login', {
+            method: "POST", body: {
+                username: userValue,
+                password: passValue
+            }
+        })
+            .then(res => { res.json() })
+            .then(res => {
+
+            })
+    };
+
+
     return (
         <Wrapper>
             <LoginWrapper>
@@ -20,6 +36,11 @@ const Login = () => {
                     <Input type="password" icon="password" label="Password" placeholder="Enter password" setValue={setPassValue} />
                     <ForgotPass>Forgotten password?</ForgotPass>
                 </LoginForm>
+
+                <ButtonWrapper>
+                    <ColorButton color='#A691DB' text="Login" textColor="white" type="" width='40%' height='3.5rem' />
+                    <ColorButton color='#F591CD' text="Sign up" textColor="white" type="" width='40%' height='3.5rem' />
+                </ButtonWrapper>
 
             </LoginWrapper>
         </Wrapper>
@@ -38,17 +59,19 @@ align-items: center;
 `;
 
 const LoginWrapper = styled.div`
+display: flex;
+flex-direction: column;
 border-radius: 15px;
 box-shadow: 0 0 10px 2px black;
 width: 400px;
-min-height:650px;
+height:600px;
 background-color: white;
 font-family: 'Reem Kufi Ink', sans-serif;
 `;
 
 const LogoWrapper = styled.div`
 width: 100%;
-height: 150px;
+height: 250px;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -62,7 +85,7 @@ height: 70px;
 const LogoText = styled.h1`
 font-size: 4rem;
 margin-left: 1rem;
-background: -webkit-linear-gradient(60deg, lightblue, purple, pink, orange);
+background: -webkit-linear-gradient(60deg, #A5D6AF, #A691DB, #F591CD, #FFC894);
 -webkit-background-clip: text;
 background-clip: text;
 -webkit-text-fill-color: transparent;
@@ -92,5 +115,12 @@ user-select: none;
 &:active{
     transform: translateZ(0) scale(.97);
 }
+`;
+
+const ButtonWrapper = styled.div`
+height: 50%;
+justify-content: center;
+display: flex;
+align-items: center;
 `;
 export default Login;

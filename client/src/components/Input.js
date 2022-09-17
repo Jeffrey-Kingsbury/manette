@@ -1,15 +1,16 @@
 import styled from 'styled-components';
 import { FaUserAlt, FaKey } from 'react-icons/fa';
+import { useState } from 'react';
 
 const Input = ({ icon, type, label, placeholder, setValue }) => {
-
+    const [iconFill, setIconFill] = useState("gray")
     const getIcon = () => {
         switch (icon) {
             case "user":
-                return <FaUserAlt fill='gray' size={30} />
+                return <FaUserAlt fill={iconFill} size={30} />
 
             case "password":
-                return <FaKey fill='gray' size={30} />
+                return <FaKey fill={iconFill} size={30} />
 
             default:
                 return null;
@@ -21,7 +22,7 @@ const Input = ({ icon, type, label, placeholder, setValue }) => {
             <Label>{label}</Label>
             <InputWrapper>
                 {getIcon()}
-                <In type={type} placeholder={placeholder} onChange={(e) => { setValue(e.target.value) }} />
+                <In type={type} placeholder={placeholder} onChange={(e) => { setValue(e.target.value) }} onBlur={() => { setIconFill("gray") }} onFocus={() => { setIconFill("#A691DB") }} />
             </InputWrapper>
         </>
     );
@@ -56,11 +57,13 @@ font-size: larger;
 border: 0;
 background-color: transparent;
 margin-left: 1rem;
+
 &:focus{
     outline: none;
+    color: purple;
 
     &::placeholder{
-        color:lightgray
+        color:#A691DB;
     }
 }
 `;
