@@ -40,8 +40,12 @@ align-items: center;
 justify-content: center;
 height: 2.5rem;
 width: 250px;
-border-bottom: 2px solid gray;
+border-bottom: 1px solid gray;
 padding: 0 .5rem;
+
+&:focus-within{
+    border-bottom: 2px solid gray;
+}
 `;
 
 const In = styled.input`
@@ -54,6 +58,10 @@ background-color: transparent;
 margin-left: 1rem;
 &:focus{
     outline: none;
+
+    &::placeholder{
+        color:lightgray
+    }
 }
 `;
 

@@ -11,16 +11,16 @@ const Login = () => {
         <Wrapper>
             <LoginWrapper>
                 <LogoWrapper>
-                    <Logo src={logo} alt="Manette Logo" draggable="false"/>
+                    <Logo src={logo} alt="Manette Logo" draggable="false" />
                     <LogoText>Manette</LogoText>
                 </LogoWrapper>
 
                 <LoginForm>
-                <Input type="text" icon="user" label="Username" placeholder="Enter username" setValue={setUserValue}/>
-                <Input type="password" icon="password" label="Password" placeholder="Enter password" setValue={setPassValue}/>
-                <ForgotPass>Forgotten password?</ForgotPass>
+                    <Input type="text" icon="user" label="Username" placeholder="Enter username" setValue={setUserValue} />
+                    <Input type="password" icon="password" label="Password" placeholder="Enter password" setValue={setPassValue} />
+                    <ForgotPass>Forgotten password?</ForgotPass>
                 </LoginForm>
-                
+
             </LoginWrapper>
         </Wrapper>
     )
@@ -78,7 +78,7 @@ justify-content: center;
 
 const ForgotPass = styled.p`
 width: 270px;
-margin-top: .25rem;
+margin-top: .5rem;
 cursor: pointer;
 font-size: medium;
 font-style: italic;
