@@ -1,14 +1,25 @@
+//DOTENV CONFIG
 require('dotenv').config()
-const nodemailer = require("nodemailer");
+
+//JWT
 const jwt = require("jsonwebtoken");
+
+//BCRYPT CONFIGS
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+
+//MONGO CONFIGS
 const { MongoClient } = require("mongodb");
 const { MONGO_URI } = process.env;
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 };
+const client = new MongoClient(MONGO_URI, options);
+const db = client.db("Manette");
+
+//NODEMAILER CONFIGS
+const nodemailer = require("nodemailer");
 const NODEMAILERU = process.env.NODEMAILERU
 const NODEMAILERP = process.env.NODEMAILERP
 const NODEMAILERHOST = process.env.NODEMAILERHOST;
@@ -24,8 +35,12 @@ let transporter = nodemailer.createTransport({
 });
 
 
+//Send emails via nodemailer.
+//REQUIRED DATA: To, Subject, Text, HTML.
+//OPTIONAL DATA: CC, BCC
 const sendMail = async (req, res) => {
-    if (req.body.to === undefined
+    if (
+        req.body.to === undefined
         || req.body.subject === undefined
         || req.body.text === undefined
         || req.body.html === undefined) {
@@ -64,19 +79,17 @@ const handleSignup = async (req, res) => {
     const email = req.body.email;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
-    const client = new MongoClient(MONGO_URI, options);
-    const db = client.db("Manette");
 
     //If the info is missing (Which shouldn't be possible but just in case)
     if (!user || !pass || !email || !firstName || !lastName) {
         res.status(400).json({ status: 400, message: "Missing info" });
-        return
+        return;
     }
 
     const ranAuth = Math.floor(Math.random() * (10000 - 1000) + 1000);
     const profile = {
-        auth: ranAuth,
-        isAuth: false
+        verificationCode: ranAuth,
+        verifiedEmail: false
     };
 
 
@@ -113,9 +126,9 @@ const handleSignup = async (req, res) => {
             await transporter.sendMail({
                 from: NODEMAILERU,
                 to: email,
-                subject: "Manette - Authenticate your email!",
-                text: "Use this code to authenticate your email: " + ranAuth,
-                html: `<b>Use this code to authenticate your email: ${ranAuth}</b>`,
+                subject: "Manette - email verification",
+                text: "Use this code to verify your email: " + ranAuth,
+                html: `<b>Use this code to verify your email: ${ranAuth}</b>`,
             });
 
 
@@ -140,8 +153,6 @@ const handleSignup = async (req, res) => {
 const handleLogin = async (req, res) => {
     const user = req.body.username;
     const pass = req.body.password;
-    const client = new MongoClient(MONGO_URI, options);
-    const db = client.db("Manette");
 
     //If the info is missing (Which shouldn't be possible but just in case)
     if (!user || !pass) {
@@ -187,4 +198,72 @@ const handleLogin = async (req, res) => {
 
 };
 
-module.exports = { sendMail, handleLogin, handleSignup };
+
+const forgotPassword = async (req, res) => {
+    const user = req.body.username;
+
+    if (!user) {
+        res.status(400).json({ status: 400, message: "No username provided." });
+        return
+    }
+
+    try {
+        //Connect to mongo
+        await client.connect();
+        console.log("connected!");
+
+        //Find the user based on username
+        const lookup = await db.collection("users").findOne({ username: user });
+        if (!lookup) {
+            res
+                .status(200)
+                .json({ status: 400, message: "If the username exists, an email will be sent to the email associated with that account." });
+            return;
+        }
+
+        const resetToken = jwt.sign({ username: lookup.username, email: lookup.email, reset: true }, process.env.JWTPRIVATE, { expiresIn: "1h" });
+        await transporter.sendMail({
+            from: NODEMAILERU,
+            to: lookup.email,
+            subject: "Manette - Password reset request.",
+            text: "Go here to reset your Manette password! https://www.manette.ca/resetpassword/" + resetToken,
+            html: ` Click here to reset your password: <a target="_blank" href="https://www.manette.ca/resetpassword/${resetToken}">RESET MY PASSWORD</a>`,
+        });
+
+        res.status(200).json({ status: 200, success: true });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ status: 500, data: req.body, message: err.message });
+    } finally {
+        client.close();
+        console.log("disconnected!");
+        return;
+    }
+};
+
+const resetPassword = async (req, res) => {
+    const resetToken = req.params.token;
+
+    try {
+        jwt.verify(resetToken, process.env.JWTPRIVATE, async (err, decoded) => {
+
+
+            //if err -> either invalid or expired
+            if (err) {
+                res.status(400).json({ status: 400, data: resetToken, error: err.message });
+                return;
+            }
+
+            //if decoded -> correct token, allow password reset.
+            res.status(200).json({ status: 200, username: decoded.username })
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(401).json({ status: 401, error: "Auth token invalid." })
+    }
+
+};
+
+module.exports = { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword };

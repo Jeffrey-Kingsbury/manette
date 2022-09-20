@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 8000;
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const jwt = require("jsonwebtoken");
-const { sendMail, handleLogin, handleSignup } = require("./handlers");
+const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword } = require("./handlers");
 const { verification } = require("./verification");
 
 require('dotenv').config()
@@ -23,7 +23,11 @@ app.get("/", (req, res) => {
 app.post("/login", handleLogin);
 app.post("/signup", handleSignup);
 app.post("/sendmail", verification, sendMail);
-
+app.post("/forgotPassword", forgotPassword);
+app.get("/resetPassword/:token", resetPassword);
+app.get("*", (req, res) =>{
+    res.status(404).send();
+})
 
 app.listen(PORT, () => {
     console.log("Listening on port", PORT);
