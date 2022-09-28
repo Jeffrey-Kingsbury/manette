@@ -1,33 +1,38 @@
+//IMPORTS
 const express = require("express");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 8000;
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
-const jwt = require("jsonwebtoken");
 const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword } = require("./handlers");
 const { verification } = require("./verification");
+const morgan = require("morgan");
 
+//CONFIGS
 require('dotenv').config()
-
 const app = express();
+app.use(morgan("tiny"));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-    res.send("Hello world");
-});
 
+// GET REQUESTS
+app.get("/resetPassword/:token", resetPassword);
+app.get("/verifyToken", verification, (req, res) => {
+    res.json({ token: true });
+})
+//POST REQUESTS
 app.post("/login", handleLogin);
 app.post("/signup", handleSignup);
 app.post("/sendmail", verification, sendMail);
 app.post("/forgotPassword", forgotPassword);
-app.get("/resetPassword/:token", resetPassword);
-app.get("*", (req, res) =>{
-    res.status(404).send();
-})
+
+//PATCH REQUESTS
+
+//DELETE REQUESTS
+
+
 
 app.listen(PORT, () => {
     console.log("Listening on port", PORT);

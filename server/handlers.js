@@ -86,9 +86,7 @@ const handleSignup = async (req, res) => {
         return;
     }
 
-    const ranAuth = Math.floor(Math.random() * (10000 - 1000) + 1000);
     const profile = {
-        verificationCode: ranAuth,
         verifiedEmail: false
     };
 
@@ -127,8 +125,8 @@ const handleSignup = async (req, res) => {
                 from: NODEMAILERU,
                 to: email,
                 subject: "Manette - email verification",
-                text: "Use this code to verify your email: " + ranAuth,
-                html: `<b>Use this code to verify your email: ${ranAuth}</b>`,
+                text: "You have been invited to demo.manette.ca. Sign in to complete your profile!" ,
+                html: `You have been invited to <a href="demo.manette.ca" target="_blank">demo.manette.ca</a>. Sign in to complete your profile!`,
             });
 
 
@@ -151,12 +149,13 @@ const handleSignup = async (req, res) => {
 
 
 const handleLogin = async (req, res) => {
+    console.log(req.body)
     const user = req.body.username;
     const pass = req.body.password;
 
     //If the info is missing (Which shouldn't be possible but just in case)
     if (!user || !pass) {
-        res.status(400).json({ status: 400, message: "User not found" });
+        res.status(400).json({ status: 400, message: "Invalid username or password" });
         return
     }
 
@@ -170,14 +169,14 @@ const handleLogin = async (req, res) => {
         if (!lookup) {
             res
                 .status(400)
-                .json({ status: 400, message: "User not found" });
+                .json({ status: 400, message: "Invalid username or password" });
             return;
         }
 
         //Compare the plaintext with the hash
         await bcrypt.compare(pass, lookup.password).then(function (result) {
             if (!result) {
-                res.status(403).json({ status: 403, message: "Incorrect username or password." });
+                res.status(403).json({ status: 403, message: "Invalid username or password" });
                 return
             }
 
@@ -200,9 +199,9 @@ const handleLogin = async (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
-    const user = req.body.username;
+    const email = req.body.email;
 
-    if (!user) {
+    if (!email) {
         res.status(400).json({ status: 400, message: "No username provided." });
         return
     }
@@ -212,12 +211,12 @@ const forgotPassword = async (req, res) => {
         await client.connect();
         console.log("connected!");
 
-        //Find the user based on username
-        const lookup = await db.collection("users").findOne({ username: user });
+        //Find the user based on email
+        const lookup = await db.collection("users").findOne({ email: email });
         if (!lookup) {
             res
                 .status(200)
-                .json({ status: 400, message: "If the username exists, an email will be sent to the email associated with that account." });
+                .json({ status: 200, message: "If the email exists in our database, an email will be sent with a link to reset the password." });
             return;
         }
 
@@ -230,7 +229,7 @@ const forgotPassword = async (req, res) => {
             html: ` Click here to reset your password: <a target="_blank" href="https://www.manette.ca/resetpassword/${resetToken}">RESET MY PASSWORD</a>`,
         });
 
-        res.status(200).json({ status: 200, success: true });
+        res.status(200).json({ status: 200, success: true, message:"If the email exists in our database, an email will be sent with a link to reset the password." });
 
     } catch (err) {
         console.log(err);

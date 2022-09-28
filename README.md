@@ -11,13 +11,13 @@ Manette is a bug tracking application designed for the quality assurance domain.
 * Open a new terminal.
 * Navigate to the server folder with ```cd server``` from the root.
 * Install the dependencies with ```yarn install``` or ```npm install```.
-* Start the server with ```yarn dev:server```.
+* Start the server with ```yarn dev```.
 
 ## Starting the client:
 * Open a new terminal. (Ensure the server remains running)
 * Navigate to the client folder with ```cd client``` from the root.
 * Install the dependencies with ```yarn install``` or ```npm install```.
-* Start the server with ```yarn dev:client```.
+* Start the server with ```yarn dev```.
 
 #
 ## Users will be able to:

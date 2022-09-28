@@ -2,15 +2,17 @@ import styled from 'styled-components';
 import { FaUserAlt, FaKey } from 'react-icons/fa';
 import { useState } from 'react';
 
-const Input = ({ icon, type, label, placeholder, setValue }) => {
+const Input = ({ icon, type, label, placeholder, setValue, required = false, tab = 0 }) => {
+
     const [iconFill, setIconFill] = useState("gray")
+    
     const getIcon = () => {
         switch (icon) {
             case "user":
-                return <FaUserAlt fill={iconFill} size={30} />
+                return <FaUserAlt fill={iconFill} size={20} />
 
             case "password":
-                return <FaKey fill={iconFill} size={30} />
+                return <FaKey fill={iconFill} size={20} />
 
             default:
                 return null;
@@ -21,8 +23,19 @@ const Input = ({ icon, type, label, placeholder, setValue }) => {
         <>
             <Label>{label}</Label>
             <InputWrapper>
-                {getIcon()}
-                <In type={type} placeholder={placeholder} onChange={(e) => { setValue(e.target.value) }} onBlur={() => { setIconFill("gray") }} onFocus={() => { setIconFill("#A691DB") }} />
+                <IconWrapper>
+                    {getIcon()}
+                </IconWrapper>
+
+                <In
+                    type={type}
+                    required={required}
+                    placeholder={placeholder}
+                    onChange={(e) => { setValue(e.target.value) }}
+                    onBlur={() => { setIconFill("gray") }}
+                    onFocus={() => { setIconFill("#A691DB") }}
+                    tabIndex={tab}
+                />
             </InputWrapper>
         </>
     );
@@ -56,7 +69,6 @@ border-radius: 10px;
 font-size: larger;
 border: 0;
 background-color: transparent;
-margin-left: 1rem;
 
 &:focus{
     outline: none;
@@ -66,6 +78,10 @@ margin-left: 1rem;
         color:#A691DB;
     }
 }
+`;
+
+const IconWrapper = styled.div`
+margin-right: 1rem;
 `;
 
 export default Input;
