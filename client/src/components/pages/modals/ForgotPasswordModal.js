@@ -10,10 +10,13 @@ const ForgotPasswordModal = ({ setForgotModal }) => {
     const [submitted, setSubmitted] = useState(false);
     const [currentlySubmitting, setCurrentlySubmitting] = useState(false);
     const [message, setMessage] = useState(false);
-    
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setButtonDisabled(true);
         setCurrentlySubmitting(true);
+        
         await fetch("/forgotPassword", {
             method: "POST",
             headers: {
@@ -83,7 +86,7 @@ const ForgotPasswordModal = ({ setForgotModal }) => {
                                     type="submit"
                                     width="50%"
                                     height="3.5rem"
-                                    disabled={currentlySubmitting}
+                                    disabled={buttonDisabled}
                                 />
                             </ButtonWrapper>
                         </form>

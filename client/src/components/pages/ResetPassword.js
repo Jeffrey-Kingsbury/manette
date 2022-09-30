@@ -13,6 +13,7 @@ const ResetPassword = () => {
     const [userToReset, setUserToReset] = useState(false);
     const [passValue, setPassValue] = useState(false);
     const [error, setError] = useState(false);
+    const [redirecting, setRedirecting] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -43,14 +44,28 @@ const ResetPassword = () => {
         await fetch('/resetpassword/' + resetToken.token, {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify(resetToken)
+            body: JSON.stringify({ token: resetToken.token, password: passValue })
 
         })
             .then(res => res.json())
-            .then(res => console.log(res));
+            .then(res => {
+                if (res.status === 200) {
+                    handleRedirect();
+                    setError(false);
+                    setRedirecting(true);
+                    return;
+                }
+                
+                setError(res.message);
+            });
     };
 
 
+    const handleRedirect = () => {
+        setTimeout(() => {
+            navigate('/')
+        }, 3000)
+    }
 
     return (
         <Wrapper>
@@ -73,15 +88,28 @@ const ResetPassword = () => {
                         Password reset
                     </Subtitle>
                 </span>
+                {error &&
+                    <ErrorWrapper>
+                        {/* Error messages to be displayed to the user. */}
 
-                <ErrorWrapper>
-                    {/* Error messages to be displayed to the user. */}
-                    {error && (
                         <FadeIn transitionDuration={500}>
                             <ErrorText> {error} </ErrorText>
                         </FadeIn>
-                    )}
-                </ErrorWrapper>
+
+                    </ErrorWrapper>
+                }
+
+                {redirecting &&
+                    <ErrorWrapper>
+                        {/*Redirecting message*/}
+                        <Loading />
+                        <FadeIn transitionDuration={500}>
+                            <ErrorText>Password successfully changed. Redirecting...</ErrorText>
+                        </FadeIn>
+
+                    </ErrorWrapper>
+                }
+
 
                 {userToReset && <>
                     <InputWrapper>
@@ -94,7 +122,7 @@ const ResetPassword = () => {
                             required={true}
                         />
                     </InputWrapper>
-                    <InputWrapper>
+                    <ButtonWrapper>
 
                         <ColorButton
                             color="#A691DB"
@@ -105,10 +133,10 @@ const ResetPassword = () => {
                             height="3.5rem"
                             func={handleReset}
                         />
-                    </InputWrapper>
+                    </ButtonWrapper>
                 </>}
 
-                {!userToReset && <InputWrapper>
+                {!userToReset && <ButtonWrapper>
 
                     <ColorButton
                         color="#A691DB"
@@ -119,7 +147,7 @@ const ResetPassword = () => {
                         height="3.5rem"
                         func={() => { navigate('/') }}
                     />
-                </InputWrapper>}
+                </ButtonWrapper>}
             </Container>
         </Wrapper>
 
@@ -145,6 +173,7 @@ const Container = styled.div`
   width: 400px;
   background-color: white;
   font-family: "Reem Kufi Ink", sans-serif;
+  padding-bottom: 2rem;
 `;
 
 const LogoWrapper = styled.div`
@@ -213,6 +242,14 @@ const InputWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const ButtonWrapper = styled.div`
+width: 100%;
+margin-top: 2rem;
+display: flex;
+justify-content: center;
 `;
 
 export default ResetPassword;

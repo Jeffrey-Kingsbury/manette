@@ -96,8 +96,12 @@ const handleSignup = async (req, res) => {
         await client.connect();
         console.log("connected!");
 
-        //Find the user based on username
-        const lookup = await db.collection("users").findOne({ $or: [{ username: user }, { email: email }] });
+        //regex for mongo case-insensitve search
+        const userSearch = "/^" + user.toString() + "$/i";
+        const emailSearch = "/^" + email.toString() + "$/i";
+
+        //Find the user based on username or email.
+        const lookup = await db.collection("users").find({ $or: [{ username: { $regex: userSearch } }, { email: { $regex: emailSearch } }] });
         if (lookup) {
             res
                 .status(400)
@@ -216,7 +220,7 @@ const forgotPassword = async (req, res) => {
         if (!lookup) {
             res
                 .status(200)
-                .json({ status: 200, message: "If the email exists in our database, an email will be sent with a link to reset the password." });
+                .json({ status: 200, message: "If the account is found, an email will be sent with a link to reset the password." });
             return;
         }
 
@@ -242,7 +246,13 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-    const resetToken = req.params.token;
+    const resetToken = req.body.token;
+    const newPassword = req.body.password;
+    console.log(resetToken)
+    console.log(newPassword)
+    const hasedPassword = await bcrypt.hash(newPassword, saltRounds).then(function (hash) {
+        return hash;
+    });
 
     try {
         jwt.verify(resetToken, process.env.JWTPRIVATE, async (err, decoded) => {
@@ -254,9 +264,19 @@ const resetPassword = async (req, res) => {
                 return;
             }
 
-            //if decoded -> correct token, allow password reset.
 
-            //TODO: Find and update in mongo, return success 200.
+            await client.connect();
+            console.log("connected!");
+            //regex for mongo case-insensitve search
+
+            console.log(decoded.username)
+            //Find the user based on username
+            const lookup = await db.collection("users").updateOne({ username: decoded.username }, { $set: { password: hasedPassword } });
+            if(lookup.modifiedCount > 0){
+                res.status(200).json({status:200, message:`The password for ${decoded.username} has been updated.`,});
+            } else {
+                res.status(400).json({ status: 400, message: "An error has occurred, please try again.", err:lookup });
+            }
         });
 
     } catch (err) {
