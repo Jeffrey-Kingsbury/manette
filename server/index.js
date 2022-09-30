@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 8000;
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
-const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword } = require("./handlers");
+const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword } = require("./loginHandlers");
 const { verification } = require("./verification");
 const morgan = require("morgan");
 
@@ -19,14 +19,8 @@ app.use(cookieParser());
 
 // GET REQUESTS
 app.get("/resetPassword/:token", validateResetPassword);
-
-app.get("/verifyToken", verification, (req, res) => {
-    res.json({ token: true });
-})
-app.get("/logout", (req, res) => {
-    res.clearCookie("token");
-    res.send();
-})
+app.get("/verifyToken", verification, (req, res) => { res.json({ token: true }); });
+app.get("/logout", (req, res) => { res.clearCookie("token"); res.send(); });
 
 //POST REQUESTS
 app.post("/login", handleLogin);
