@@ -125,7 +125,7 @@ const handleSignup = async (req, res) => {
                 from: NODEMAILERU,
                 to: email,
                 subject: "Manette - email verification",
-                text: "You have been invited to demo.manette.ca. Sign in to complete your profile!" ,
+                text: "You have been invited to demo.manette.ca. Sign in to complete your profile!",
                 html: `You have been invited to <a href="demo.manette.ca" target="_blank">demo.manette.ca</a>. Sign in to complete your profile!`,
             });
 
@@ -229,7 +229,7 @@ const forgotPassword = async (req, res) => {
             html: ` Click here to reset your password: <a target="_blank" href="https://www.manette.ca/resetpassword/${resetToken}">RESET MY PASSWORD</a>`,
         });
 
-        res.status(200).json({ status: 200, success: true, message:"If the email exists in our database, an email will be sent with a link to reset the password." });
+        res.status(200).json({ status: 200, success: true, message: "If the email exists in our database, an email will be sent with a link to reset the password." });
 
     } catch (err) {
         console.log(err);
@@ -255,7 +255,8 @@ const resetPassword = async (req, res) => {
             }
 
             //if decoded -> correct token, allow password reset.
-            res.status(200).json({ status: 200, username: decoded.username })
+
+            //TODO: Find and update in mongo, return success 200.
         });
 
     } catch (err) {
@@ -265,4 +266,28 @@ const resetPassword = async (req, res) => {
 
 };
 
-module.exports = { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword };
+
+const validateResetPassword = async (req, res) => {
+    const resetToken = req.params.token;
+
+    try {
+        jwt.verify(resetToken, process.env.JWTPRIVATE, async (err, decoded) => {
+
+
+            //if err -> either invalid or expired
+            if (err) {
+                res.status(400).json({ status: 400, data: resetToken, error: "This link has expired. Please send a new password recovery request." });
+                return;
+            }
+
+            //if decoded -> correct token, allow password reset.
+            res.status(200).json({ status: 200, username: decoded.username })
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(401).json({ status: 401, error: "Auth token invalid." })
+    }
+
+};
+module.exports = { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword };

@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 function verification(req, res, next) {
-    const token = req.headers['token']
-
+    const token = req.cookies['token'];
+    
     if (!token) return res.status(401).json({ status: 401, error: "Auth token missing." });
 
     try {

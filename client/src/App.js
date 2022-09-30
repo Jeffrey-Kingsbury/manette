@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./components/pages/Dashboard";
 import UserContext from './UserContext';
+import ResetPassword from "./components/pages/ResetPassword";
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/resetpassword/:token" element={<ResetPassword />} />
           </Routes>
         </Wrapper>
 
