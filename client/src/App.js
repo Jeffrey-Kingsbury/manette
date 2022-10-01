@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./components/pages/Dashboard";
 import UserContext from './UserContext';
 import ResetPassword from "./components/pages/ResetPassword";
+import bg from "./images/pastel_bg.jpg";
 
 function App() {
 
@@ -28,5 +29,9 @@ const Wrapper = styled.div`
 width: 100vw;
 height: 100vh;
 overflow: hidden;
+font-family: "Reem Kufi Ink", sans-serif;
+background-image: url(${bg});
+background-size: cover;
+background-position: center;
 `;
 export default App;

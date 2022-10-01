@@ -21,9 +21,14 @@ const UserContext = ({ children }) => {
             });
     };
 
+    const handleLogout = async() =>{
+        await fetch('/logout');
+        navigate("/");
+    };
+
     return (
         <userContext.Provider
-            value={{ userAuthenticated, setUserAuthenticated, validate }}
+            value={{ userAuthenticated, setUserAuthenticated, validate, handleLogout }}
         >
             {children}
         </userContext.Provider>

@@ -126,8 +126,6 @@ const Login = () => {
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
-  background-image: url(${bg});
-  background-size: cover;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -142,7 +140,6 @@ const LoginWrapper = styled.div`
   width: 400px;
   height: 600px;
   background-color: white;
-  font-family: "Reem Kufi Ink", sans-serif;
 `;
 
 const LogoWrapper = styled.div`

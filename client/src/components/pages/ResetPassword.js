@@ -172,7 +172,6 @@ const Container = styled.div`
   box-shadow: 0 0 10px 2px black;
   width: 400px;
   background-color: white;
-  font-family: "Reem Kufi Ink", sans-serif;
   padding-bottom: 2rem;
 `;
 
@@ -209,15 +208,12 @@ const Title = styled.h1`
     width: 100%;
     font-size: xx-large;
     text-align: center;
-    font-family: "Reem Kufi Ink", sans-serif;
-
 `;
 
 const Subtitle = styled.h1`
     width: 100%;
     font-size: x-large;
     text-align: center;
-    font-family: "Reem Kufi Ink", sans-serif;
     margin: 1rem 0;
 `;
 

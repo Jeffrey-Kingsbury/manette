@@ -121,7 +121,6 @@ const ModalWrapper = styled.div`
   border-radius: 15px;
   box-shadow: 0 0 10px 2px black;
   background-color: white;
-  font-family: "Reem Kufi Ink", sans-serif;
   cursor: default;
 `;
 
