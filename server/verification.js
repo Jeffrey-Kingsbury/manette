@@ -6,8 +6,8 @@ function verification(req, res, next) {
     if (!token) return res.status(401).json({ status: 401, error: "Auth token missing." });
 
     try {
-        jwt.verify(token, process.env.JWTPRIVATE, () => {
-            console.log('confirmed')
+        jwt.verify(token, process.env.JWTPRIVATE, (err, decoded) => {
+            res.locals.userData = decoded;
         });
 
         next();

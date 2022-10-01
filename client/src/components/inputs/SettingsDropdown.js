@@ -28,8 +28,12 @@ const Wrapper = styled.div`
   height: 200px;
   background-color: white;
   position: absolute;
-  bottom: -200px;
+  bottom: -212px;
   left: -200px;
+  z-index: 9999;
+  border: 2px solid;
+  border-top: 3px solid white;
+  box-shadow: 0 6px 2px 0 rgba(0, 0, 0, 0.3);
 `;
 
 const List = styled.ul`

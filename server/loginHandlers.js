@@ -94,7 +94,6 @@ const handleSignup = async (req, res) => {
     try {
         //Connect to mongo
         await client.connect();
-        console.log("connected!");
 
         //regex for mongo case-insensitve search
         const userSearch = "/^" + user.toString() + "$/i";
@@ -114,6 +113,7 @@ const handleSignup = async (req, res) => {
             profile.email = email;
             profile.firstName = firstName;
             profile.lastName = lastName;
+            profile.avatarSrc = null;
             profile.password = hash;
         });
 
@@ -145,7 +145,6 @@ const handleSignup = async (req, res) => {
         res.status(500).json({ status: 500, data: req.body, message: err.message });
     } finally {
         client.close();
-        console.log("disconnected!");
         return;
     }
 
@@ -153,7 +152,6 @@ const handleSignup = async (req, res) => {
 
 
 const handleLogin = async (req, res) => {
-    console.log(req.body)
     const user = req.body.username;
     const pass = req.body.password;
 
@@ -166,7 +164,6 @@ const handleLogin = async (req, res) => {
     try {
         //Connect to mongo
         await client.connect();
-        console.log("connected!");
 
         //Find the user based on username
         const lookup = await db.collection("users").findOne({ username: user });
@@ -184,7 +181,7 @@ const handleLogin = async (req, res) => {
                 return
             }
 
-            const token = jwt.sign({ username: lookup.username }, process.env.JWTPRIVATE);
+            const token = jwt.sign({ profile: { username: lookup.username, email: lookup.email, firstName: lookup.firstName, lastName: lookup.lastName, avatarSrc: lookup.avatarSrc } }, process.env.JWTPRIVATE);
             res.cookie("token", token);
             res.status(200).json({ status: 200, success: true });
         });
@@ -195,7 +192,6 @@ const handleLogin = async (req, res) => {
         res.status(500).json({ status: 500, data: req.body, message: err.message });
     } finally {
         client.close();
-        console.log("disconnected!");
         return;
     }
 
@@ -213,7 +209,6 @@ const forgotPassword = async (req, res) => {
     try {
         //Connect to mongo
         await client.connect();
-        console.log("connected!");
 
         //Find the user based on email
         const lookup = await db.collection("users").findOne({ email: email });
@@ -240,7 +235,6 @@ const forgotPassword = async (req, res) => {
         res.status(500).json({ status: 500, data: req.body, message: err.message });
     } finally {
         client.close();
-        console.log("disconnected!");
         return;
     }
 };
@@ -248,8 +242,6 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     const resetToken = req.body.token;
     const newPassword = req.body.password;
-    console.log(resetToken)
-    console.log(newPassword)
     const hasedPassword = await bcrypt.hash(newPassword, saltRounds).then(function (hash) {
         return hash;
     });
@@ -266,16 +258,14 @@ const resetPassword = async (req, res) => {
 
 
             await client.connect();
-            console.log("connected!");
             //regex for mongo case-insensitve search
 
-            console.log(decoded.username)
             //Find the user based on username
             const lookup = await db.collection("users").updateOne({ username: decoded.username }, { $set: { password: hasedPassword } });
-            if(lookup.modifiedCount > 0){
-                res.status(200).json({status:200, message:`The password for ${decoded.username} has been updated.`,});
+            if (lookup.modifiedCount > 0) {
+                res.status(200).json({ status: 200, message: `The password for ${decoded.username} has been updated.`, });
             } else {
-                res.status(400).json({ status: 400, message: "An error has occurred, please try again.", err:lookup });
+                res.status(400).json({ status: 400, message: "An error has occurred, please try again.", err: lookup });
             }
         });
 
@@ -310,4 +300,42 @@ const validateResetPassword = async (req, res) => {
     }
 
 };
-module.exports = { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword };
+
+const updateUserData = async (req, res) => {
+    const user = res.locals.userData.profile.username;
+
+    if (!user) {
+        res.status(400).json({ status: 400, message: "Invalid username or password" });
+        return
+    }
+
+    try {
+        //Connect to mongo
+        await client.connect();
+
+        //Find the user based on username
+        const lookup = await db.collection("users").findOne({ username: user });
+        if (!lookup) {
+            res
+                .status(400)
+                .json({ status: 400, message: "Invalid username or password" });
+            return;
+        }
+
+        const token = jwt.sign({ profile: { username: lookup.username, email: lookup.email, firstName: lookup.firstName, lastName: lookup.lastName, avatarSrc: lookup.avatarSrc } }, process.env.JWTPRIVATE);
+        res.clearCookie("token");
+        res.cookie("token", token);
+        res.status(200).json({ status: 200, success: true });
+
+
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ status: 500, data: req.body, message: err.message });
+    } finally {
+        client.close();
+        return;
+    }
+};
+
+module.exports = { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword, updateUserData };

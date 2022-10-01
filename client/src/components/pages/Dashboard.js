@@ -14,14 +14,13 @@ const Dashboard = () => {
         validate();
     }, []);
 
-    return (<>
-        <Header />
+    return (
         <Wrapper>
             {!userAuthenticated &&
                 <Loading />
             }
             {userAuthenticated &&
-
+            <>
                 <DashboardWrapper>
                     <YourBugsWrapper>
                         List of the bugs created by the current user
@@ -42,9 +41,9 @@ const Dashboard = () => {
                         </GraphWrapper>
                     </RightSideWrapper>
                 </DashboardWrapper>
+                </>
             }
         </Wrapper>
-    </>
     );
 };
 

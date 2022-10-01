@@ -5,6 +5,8 @@ import Dashboard from "./components/pages/Dashboard";
 import UserContext from './UserContext';
 import ResetPassword from "./components/pages/ResetPassword";
 import bg from "./images/pastel_bg.jpg";
+import Header from "./components/pages/Header";
+import NewBug from "./components/pages/newBug";
 
 function App() {
 
@@ -14,8 +16,9 @@ function App() {
 
         <Wrapper>
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<><Header /><Dashboard /></>} />
+            <Route path="/new" element={<><Header /> <NewBug /></>} />
             <Route path="/resetpassword/:token" element={<ResetPassword />} />
           </Routes>
         </Wrapper>
@@ -34,4 +37,5 @@ background-image: url(${bg});
 background-size: cover;
 background-position: center;
 `;
+
 export default App;

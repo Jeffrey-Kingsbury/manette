@@ -4,48 +4,66 @@ import { AiFillSetting } from "react-icons/ai";
 import SearchBar from "../inputs/SearchBar";
 import { useNavigate } from "react-router";
 import SettingsDropdown from '../inputs/SettingsDropdown';
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { userContext } from "../../UserContext";
 
 const Header = () => {
-    const navigate = useNavigate();
-    const [settingsActive, setSettingsActive] = useState(false);
+  const navigate = useNavigate();
+  const [settingsActive, setSettingsActive] = useState(false);
+  const { userData } = useContext(userContext);
 
-    return (
-        <Wrapper>
-            <Logo
-                alt="Manette Logo"
-                src={logo}
-                draggable="false"
-                onClick={() => {
-                    navigate("/dashboard");
-                }}
+  return (
+    <Wrapper>
+      <Logo
+        alt="Manette Logo"
+        src={logo}
+        draggable="false"
+      />
+      <NavigationWrapper>
+        <NewIssueItem onClick={() => { navigate('/new') }}>New ticket</NewIssueItem>
+        <NaigationItem onClick={()=>{fetch('/updateUserData')}}>Project</NaigationItem>
+        <NaigationItem onClick={() => { navigate('/') }}>Dashboard</NaigationItem>
+        <NaigationItem>All bugs</NaigationItem>
+        <NaigationItem>Detailed search</NaigationItem>
+      </NavigationWrapper>
+
+      <SearchBar />
+
+      <SettingsWrapper>
+        <UserDataWrapper>
+
+          {userData && userData.profile.avatarSrc &&
+            <UserAvatar
+              alt={userData.profile.firstName + "'s avatar image"}
+              src={userData.profile.avatarSrc}
+              draggable="false"
             />
-            <NavigationWrapper>
-                <NewIssueItem>New ticket</NewIssueItem>
-                <NaigationItem>Project</NaigationItem>
-                <NaigationItem>Dashboard</NaigationItem>
-                <NaigationItem>All bugs</NaigationItem>
-                <NaigationItem>Detailed search</NaigationItem>
-            </NavigationWrapper>
+          }
 
-            <SearchBar />
+          {userData && !userData.profile.avatarSrc &&
+            <UserAvatarLetterBackup>
+              {userData.profile.firstName.slice(0, 1)}
+              {userData.profile.lastName.slice(0, 1)}
+            </UserAvatarLetterBackup>
+          }
 
-            <SettingsWrapper>
+          <UserNameText>
+            Hello, {userData && userData.profile.firstName}
+          </UserNameText>
+        </UserDataWrapper>
 
-                <SettingsIconWrapper onClick={() => { setSettingsActive(!settingsActive) }}>
-                    <AiFillSetting fill="#A691DB" size={50} />
-                </SettingsIconWrapper>
+        <SettingsIconWrapper onClick={() => { setSettingsActive(!settingsActive) }}>
+          <AiFillSetting fill="#A691DB" size={50} />
+        </SettingsIconWrapper>
 
-                {
-                    settingsActive &&
-                    <>
-                    <SettingsDropdown setSettingsActive={setSettingsActive}/>
-                    </>
-                }
+        {
+          settingsActive &&
+          <SettingsDropdown setSettingsActive={setSettingsActive} />
+        }
 
-            </SettingsWrapper>
-        </Wrapper>
-    );
+      </SettingsWrapper>
+    </Wrapper>
+  );
 };
 
 const Wrapper = styled.div`
@@ -56,6 +74,8 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   background-color: white;
+  border-bottom: 2px solid;
+  user-select: none;
 `;
 
 const SettingsWrapper = styled.span`
@@ -82,6 +102,46 @@ const SettingsIconWrapper = styled.span`
   }
 `;
 
+const UserDataWrapper = styled.div`
+height: 100%;
+width: auto;
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 0 1rem;
+`;
+
+const UserNameText = styled.span`
+height: 75%;
+width: auto;
+border-right: 2px solid;
+padding-right: 1rem;
+`;
+
+const UserAvatar = styled.img`
+height: 3rem;
+border-radius: 50%;
+aspect-ratio: 1/1;
+margin-right: 1rem;
+box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.3);
+`;
+
+const UserAvatarLetterBackup = styled.div`
+width: 50px;
+height: 50px;
+aspect-ratio: 1/1;
+border-radius: 100%;
+background-color: #F591CD;
+display: flex;
+justify-content: center;
+align-items: center;
+text-align: center;
+color: white;
+font-size: x-large;
+margin: 0 1rem;
+box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.3);
+`;
+
 const NavigationWrapper = styled.ul`
   display: flex;
   align-items: flex-end;
@@ -91,6 +151,7 @@ const NavigationWrapper = styled.ul`
   height: 100%;
   user-select: none;
 `;
+
 const NaigationItem = styled.li`
 margin: 1rem;
 cursor: pointer;
@@ -134,6 +195,5 @@ const Logo = styled.img`
   user-select: none;
   transition: all ease-in-out 0.2s;
   margin-left: 1rem;
-  cursor: pointer;
 `;
 export default Header;

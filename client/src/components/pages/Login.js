@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
-import bg from "../../images/pastel_bg.jpg";
 import logo from "../../images/manette_logo.png";
 import Input from "../inputs/Input";
 import ColorButton from "../inputs/ColorButton";
 import FadeIn from "react-fade-in";
 import ForgotPasswordModal from "./modals/ForgotPasswordModal";
 import { useNavigate } from "react-router";
+import { userContext } from "../../UserContext";
 
 const Login = () => {
     const [userValue, setUserValue] = useState(null);
@@ -14,6 +14,12 @@ const Login = () => {
     const [error, setError] = useState(false);
     const [forgotModal, setForgotModal] = useState(false);
     const navigate = useNavigate();
+    const { validate } = useContext(userContext);
+
+    useEffect(()=>{
+        //If the user has a valid token, send them to the dashboard immediately. Otherwise do nothing.
+        validate().then(res => res ? navigate('/') : null);
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -32,7 +38,7 @@ const Login = () => {
             .then((res) => res.json())
             .then((res) => {
                 if (res.success) {
-                    navigate("/dashboard");
+                    navigate("/");
                     return;
                 }
                 setError(res.message);
