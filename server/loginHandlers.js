@@ -95,19 +95,21 @@ const handleSignup = async (req, res) => {
         //Connect to mongo
         await client.connect();
 
-        //regex for mongo case-insensitve search
-        const userSearch = "/^" + user.toString() + "$/i";
-        const emailSearch = "/^" + email.toString() + "$/i";
-
         //Find the user based on username or email.
-        const lookup = await db.collection("users").find({ $or: [{ username: { $regex: userSearch } }, { email: { $regex: emailSearch } }] });
-        if (lookup) {
+        //I couldn't get this to work with regex or collation in one db call. So here is two of them. ¯\_(ツ)_/¯
+        //It's such a small check that adding a second lookup here didn't seem to add any latency during my tests.
+        const lookupUsername = await db.collection("users").findOne({username:{$regex: new RegExp(user), $options:"i"}});
+        const lookupEmail = await db.collection("users").findOne({email:{$regex: new RegExp(email), $options:"i"}});
+
+        //If nothing is found, these return null. Otherwise, throw an error because the user or email exist already.
+        if (lookupUsername || lookupEmail) {
             res
                 .status(400)
                 .json({ status: 400, message: "That username or email already exists." });
             return;
-        }
+        };
 
+        //Hash and salt the password, and create the users profile.
         await bcrypt.hash(pass, saltRounds).then(function (hash) {
             profile.username = user;
             profile.email = email;
@@ -125,6 +127,7 @@ const handleSignup = async (req, res) => {
 
         try {
             // send auth code.
+            //Hard coded demo.manette.ca. This needs to be changed pre-release to reflect the correct subdomains. (STRETCH GOAL)
             await transporter.sendMail({
                 from: NODEMAILERU,
                 to: email,

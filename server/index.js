@@ -41,7 +41,34 @@ app.post("/resetPassword/:token", resetPassword);
 //PATCH REQUESTS
 
 //DELETE REQUESTS
+const { MongoClient } = require("mongodb");
+const { MONGO_URI } = process.env;
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+};
+const client = new MongoClient(MONGO_URI, options);
+const db = client.db("Manette");
 
+app.get('/createusers', async (req, res) => {
+    try {
+        //Connect to mongo
+        await client.connect();
+        await db.createCollection("users")
+        await db.collection("users").createIndex({ username: 1 },
+            { collation: { locale: 'en', strength: 2 } })
+        await db.collection("users").createIndex({ email: 1 },
+            { collation: { locale: 'en', strength: 2 } })
+        res.status(200).json({ status: 200, success: true });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ status: 500, data: req.body, message: err.message });
+    } finally {
+        client.close();
+        return;
+    }
+})
 
 
 app.listen(PORT, () => {
