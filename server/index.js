@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 8000;
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword, updateUserData } = require("./loginHandlers");
+const { newActivity, getActivityFeed } = require("./notificationHandlers");
 const { verification } = require("./verification");
 const morgan = require("morgan");
 
@@ -28,6 +29,8 @@ app.get("/verifyToken", verification, (req, res) => { res.json({ token: true, us
 app.get("/logout", (req, res) => { res.clearCookie("token"); res.send(); });
 //This will force the userdata on the frontend to be updated by issuing a new token (Ex. the user changes their avatar, call this and re-render the page)
 app.get("/updateUserData", verification, updateUserData);
+//Get the activity feed
+app.get("/activityFeed", verification, getActivityFeed);
 
 ////////////////////
 // POST REQUESTS //
@@ -37,39 +40,11 @@ app.post("/signup", handleSignup);
 app.post("/sendmail", verification, sendMail);
 app.post("/forgotPassword", forgotPassword);
 app.post("/resetPassword/:token", resetPassword);
+app.post("/notifications",  newActivity);
 
 //PATCH REQUESTS
 
 //DELETE REQUESTS
-const { MongoClient } = require("mongodb");
-const { MONGO_URI } = process.env;
-const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-};
-const client = new MongoClient(MONGO_URI, options);
-const db = client.db("Manette");
-
-app.get('/createusers', async (req, res) => {
-    try {
-        //Connect to mongo
-        await client.connect();
-        await db.createCollection("users")
-        await db.collection("users").createIndex({ username: 1 },
-            { collation: { locale: 'en', strength: 2 } })
-        await db.collection("users").createIndex({ email: 1 },
-            { collation: { locale: 'en', strength: 2 } })
-        res.status(200).json({ status: 200, success: true });
-
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ status: 500, data: req.body, message: err.message });
-    } finally {
-        client.close();
-        return;
-    }
-})
-
 
 app.listen(PORT, () => {
     console.log("Listening on port", PORT);

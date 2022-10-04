@@ -79,6 +79,7 @@ const handleSignup = async (req, res) => {
     const email = req.body.email;
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
+    const role = req.body.role;
 
     //If the info is missing (Which shouldn't be possible but just in case)
     if (!user || !pass || !email || !firstName || !lastName) {
@@ -87,7 +88,11 @@ const handleSignup = async (req, res) => {
     }
 
     const profile = {
-        verifiedEmail: false
+        verifiedEmail: false,
+        role: role ? role : 'analyst',
+        firstName: firstName,
+        lastName: lastName,
+        avatarSrc: null
     };
 
 
@@ -98,8 +103,8 @@ const handleSignup = async (req, res) => {
         //Find the user based on username or email.
         //I couldn't get this to work with regex or collation in one db call. So here is two of them. ¯\_(ツ)_/¯
         //It's such a small check that adding a second lookup here didn't seem to add any latency during my tests.
-        const lookupUsername = await db.collection("users").findOne({username:{$regex: new RegExp(user), $options:"i"}});
-        const lookupEmail = await db.collection("users").findOne({email:{$regex: new RegExp(email), $options:"i"}});
+        const lookupUsername = await db.collection("users").findOne({ username: { $regex: new RegExp(user), $options: "i" } });
+        const lookupEmail = await db.collection("users").findOne({ email: { $regex: new RegExp(email), $options: "i" } });
 
         //If nothing is found, these return null. Otherwise, throw an error because the user or email exist already.
         if (lookupUsername || lookupEmail) {
@@ -113,9 +118,6 @@ const handleSignup = async (req, res) => {
         await bcrypt.hash(pass, saltRounds).then(function (hash) {
             profile.username = user;
             profile.email = email;
-            profile.firstName = firstName;
-            profile.lastName = lastName;
-            profile.avatarSrc = null;
             profile.password = hash;
         });
 

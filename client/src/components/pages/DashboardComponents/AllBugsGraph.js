@@ -19,7 +19,7 @@ const AllBugsGraph = () =>{
             },
         ],
     };
-    return(<Wrapper>                                
+    return(<Wrapper>   
     <Pie data={data} 
         width={'50%'}
         height={'50%'}
@@ -31,6 +31,9 @@ display: flex;
 justify-content: center;
 align-items: center;
 width: 90%;
-height: 80%;
+height: 70%;
+margin: auto;
 `;
+
+
 export default AllBugsGraph;
