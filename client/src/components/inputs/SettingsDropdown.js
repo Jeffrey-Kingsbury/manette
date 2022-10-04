@@ -11,13 +11,19 @@ const SettingsDropdown = ({ setSettingsActive }) => {
             <List>
                 <Option
                     onClick={() => {
+
+                    }}
+                >
+                    Profile
+                </Option>
+                <Option
+                    onClick={() => {
                         setSettingsActive(false);
                         handleLogout();
                     }}
                 >
                     Log out
                 </Option>
-
             </List>
         </Wrapper>
     );
@@ -25,11 +31,10 @@ const SettingsDropdown = ({ setSettingsActive }) => {
 
 const Wrapper = styled.div`
   width: 250px;
-  height: 200px;
   background-color: white;
   position: absolute;
-  bottom: -212px;
-  left: -200px;
+  bottom: -110px;
+  left: 0px;
   z-index: 9999;
   border: 2px solid;
   border-top: 3px solid white;

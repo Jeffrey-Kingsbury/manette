@@ -6,7 +6,11 @@ const options = {
     useUnifiedTopology: true,
 };
 
-const getProjectData = async(req,res) => {
+const getTemplate = async (req, res) => {
+    const project = req.params.project;
+};
+
+const getUsers = async (req, res) => {
     const client = new MongoClient(MONGO_URI, options);
     const db = client.db("Manette");
 
@@ -15,7 +19,7 @@ const getProjectData = async(req,res) => {
         await client.connect();
 
         //Find the user based on username
-        const lookup = await db.collection("ticket_data").find().toArray();
+        const lookup = await db.collection("users").find({}).project({username:1, role:1, firstName:1, lastName:1, _id:0}).toArray();
         if (!lookup) {
             res
                 .status(400)
@@ -36,4 +40,4 @@ const getProjectData = async(req,res) => {
     }
 };
 
-module.exports = {getProjectData};
+module.exports = { getTemplate, getUsers };

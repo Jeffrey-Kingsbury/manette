@@ -5,7 +5,6 @@ import { FaFileUpload } from "react-icons/fa";
 
 const NotificationBars = ({ notif }) => {
     const { role, firstName, lastName, avatarSrc } = notif.updateUserProfile;
-    console.log(notif);
     const { bugNum, time, type, updateUser } = notif;
 
     const getNotification = () => {
@@ -26,7 +25,7 @@ const NotificationBars = ({ notif }) => {
             case "ADDCOMMENT":
                 return (
                     <Message>
-                       Added a comment to <a>{bugNum}</a>
+                        Added a comment to <a>{bugNum}</a>
                     </Message>
                 );
 
@@ -104,7 +103,6 @@ const Wrapper = styled.div`
 `;
 
 const Avatar = styled.img`
-  min-height: 100%;
   width: 75px;
 `;
 
@@ -119,6 +117,7 @@ const Initials = styled.div`
   align-items: center;
   font-size: 2rem;
   text-align: center;
+  user-select: none;
 `;
 
 const MessageWrapper = styled.div`
@@ -148,7 +147,7 @@ const Message = styled.p`
 `;
 
 const IconWrapper = styled.div`
-  width: 40px;
+  width: 60px;
   height: 100%;
   display: flex;
   justify-content: center;

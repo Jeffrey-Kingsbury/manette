@@ -1,11 +1,13 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 export const userContext = createContext();
 
 const UserContext = ({ children }) => {
     const [userAuthenticated, setUserAuthenticated] = useState(false);
-    const [userData, setUserData] = useState({profile:{firstName:"", lastName:"", avatarSrc:""}});
+    const [projectData, setProjectData] = useState(false);
+    const [allUserData, setAllUserData] = useState(false);
+    const [currentUserData, setCurrentUserData] = useState({profile:{firstName:"", lastName:"", avatarSrc:""}});
     const navigate = useNavigate();
 
     const validate = async () => {
@@ -17,7 +19,7 @@ const UserContext = ({ children }) => {
                     navigate("/login");
                     return false;
                 }
-                setUserData(res.userData);
+                setCurrentUserData(res.currentUserData.profile);
                 setUserAuthenticated(true);
                 return true;
             });
@@ -28,9 +30,27 @@ const UserContext = ({ children }) => {
         navigate("/login");
     };
 
+    useEffect(()=>{
+        const getProjectData = async() =>{
+            return await fetch('/projectData')
+            .then(res => res.json())
+            .then(res => setProjectData(res.data[0].projects))
+        }
+        getProjectData();
+    }, [userAuthenticated]);
+
+    useEffect(()=>{
+        const getAllUserData = async() =>{
+            return await fetch('/getUsers')
+            .then(res => res.json())
+            .then(res => setAllUserData(res.data))
+        }
+        getAllUserData();
+    }, [projectData]);
+
     return (
         <userContext.Provider
-            value={{ userAuthenticated, userData, setUserAuthenticated, validate, handleLogout }}
+            value={{ userAuthenticated, currentUserData, allUserData, setUserAuthenticated, validate, handleLogout, projectData }}
         >
             {children}
         </userContext.Provider>

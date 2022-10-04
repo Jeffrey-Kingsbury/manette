@@ -8,7 +8,6 @@ import ActivityFeed from "./DashboardComponents/ActivityFeed";
 
 const Dashboard = () => {
     const { userAuthenticated, validate } = useContext(userContext);
-
     useEffect(() => {
         validate();
     }, []);
@@ -20,7 +19,11 @@ const Dashboard = () => {
                 <>
                     <DashboardWrapper>
                         <YourBugsWrapper>
-                            List of the bugs created by the current user
+                        <Title>Your open tickets</Title>
+
+                      <YouBugsContainer>
+
+                      </YouBugsContainer>
                         </YourBugsWrapper>
 
                         <RightSideWrapper>
@@ -28,12 +31,12 @@ const Dashboard = () => {
 
                             <GraphWrapper>
                                 <BugsGraphWrapper>
-                                <GraphTitle>All bugs</GraphTitle>
+                                <Title>All tickets</Title>
                                     <AllBugsGraph />
                                 </BugsGraphWrapper>
 
                                 <BugsGraphWrapper>
-                                    <GraphTitle>Your bugs</GraphTitle>
+                                    <Title>Your tickets</Title>
                                     <YourBugsGraph />
                                 </BugsGraphWrapper>
                             </GraphWrapper>
@@ -74,6 +77,13 @@ const YourBugsWrapper = styled.div`
   border-radius: 15px;
   box-shadow: 1px 5px 15px 5px rgba(0, 0, 0, 0.3);
   margin: 0 1rem;
+  overflow: hidden;
+`;
+
+const YouBugsContainer = styled.div`
+width: 100%;
+height: 100%;
+overflow: scroll;
 `;
 
 const RightSideWrapper = styled.div`
@@ -91,7 +101,7 @@ const GraphWrapper = styled.div`
   align-items: center;
 `;
 
-const GraphTitle = styled.h1`
+const Title = styled.h1`
 width: 100%;
 height: 2rem;
 display: flex;
@@ -102,6 +112,7 @@ padding: .25rem 0;
 box-shadow: 0 0 5px 5px rgba(0,0,0,0.3);
 background-color: #A691DB;
 color:white;
+user-select: none;
 `;
 
 const BugsGraphWrapper = styled.div`

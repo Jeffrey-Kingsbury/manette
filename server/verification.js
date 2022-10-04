@@ -7,7 +7,7 @@ function verification(req, res, next) {
 
     try {
         jwt.verify(token, process.env.JWTPRIVATE, (err, decoded) => {
-            res.locals.userData = decoded;
+            res.locals.currentUserData = decoded;
         });
 
         next();

@@ -10,7 +10,7 @@ import { userContext } from "../../UserContext";
 const Header = () => {
   const navigate = useNavigate();
   const [settingsActive, setSettingsActive] = useState(false);
-  const { userData } = useContext(userContext);
+  const { currentUserData } = useContext(userContext);
 
   return (
     <Wrapper>
@@ -27,28 +27,28 @@ const Header = () => {
         <NaigationItem>Detailed search</NaigationItem>
       </NavigationWrapper>
 
-      <SearchBar />
+      {/*<SearchBar />*/}
 
       <SettingsWrapper>
         <UserDataWrapper>
-
-          {userData && userData.profile.avatarSrc &&
+    
+          {currentUserData && currentUserData.avatarSrc &&
             <UserAvatar
-              alt={userData.profile.firstName + "'s avatar image"}
-              src={userData.profile.avatarSrc}
+              alt={currentUserData.firstName + "'s avatar image"}
+              src={currentUserData.avatarSrc}
               draggable="false"
             />
           }
 
-          {userData && !userData.profile.avatarSrc &&
+          {currentUserData.firstName && !currentUserData.avatarSrc &&
             <UserAvatarLetterBackup>
-              {userData.profile.firstName.slice(0, 1)}
-              {userData.profile.lastName.slice(0, 1)}
+              {currentUserData.firstName.slice(0, 1)}
+              {currentUserData.lastName.slice(0, 1)}
             </UserAvatarLetterBackup>
           }
 
           <UserNameText>
-            Hello, {userData && userData.profile.firstName}
+            Hello, {currentUserData && currentUserData.firstName}
           </UserNameText>
         </UserDataWrapper>
 

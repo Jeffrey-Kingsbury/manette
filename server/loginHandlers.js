@@ -15,8 +15,6 @@ const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 };
-const client = new MongoClient(MONGO_URI, options);
-const db = client.db("Manette");
 
 //NODEMAILER CONFIGS
 const nodemailer = require("nodemailer");
@@ -39,6 +37,9 @@ let transporter = nodemailer.createTransport({
 //REQUIRED DATA: To, Subject, Text, HTML.
 //OPTIONAL DATA: CC, BCC
 const sendMail = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const db = client.db("Manette");
+
     if (
         req.body.to === undefined
         || req.body.subject === undefined
@@ -74,6 +75,9 @@ const sendMail = async (req, res) => {
 };
 
 const handleSignup = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const db = client.db("Manette");
+
     const user = req.body.username;
     const pass = req.body.password;
     const email = req.body.email;
@@ -157,6 +161,9 @@ const handleSignup = async (req, res) => {
 
 
 const handleLogin = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const db = client.db("Manette");
+
     const user = req.body.username;
     const pass = req.body.password;
 
@@ -204,6 +211,9 @@ const handleLogin = async (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const db = client.db("Manette");
+
     const email = req.body.email;
 
     if (!email) {
@@ -245,6 +255,9 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+    const client = new MongoClient(MONGO_URI, options);
+    const db = client.db("Manette");
+
     const resetToken = req.body.token;
     const newPassword = req.body.password;
     const hasedPassword = await bcrypt.hash(newPassword, saltRounds).then(function (hash) {
@@ -307,7 +320,10 @@ const validateResetPassword = async (req, res) => {
 };
 
 const updateUserData = async (req, res) => {
-    const user = res.locals.userData.profile.username;
+    const client = new MongoClient(MONGO_URI, options);
+    const db = client.db("Manette");
+
+    const user = res.locals.currentUserData.username;
 
     if (!user) {
         res.status(400).json({ status: 400, message: "Invalid username or password" });

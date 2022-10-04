@@ -6,7 +6,7 @@ import UserContext from './UserContext';
 import ResetPassword from "./components/pages/ResetPassword";
 import bg from "./images/pastel_bg.jpg";
 import Header from "./components/pages/Header";
-import NewBug from "./components/pages/newBug";
+import NewBug from "./components/pages/NewBug";
 
 function App() {
 
@@ -29,7 +29,7 @@ function App() {
 }
 
 const Wrapper = styled.div`
-width: 100vw;
+max-width: 100vw;
 height: 100vh;
 overflow: hidden;
 font-family: "Reem Kufi Ink", sans-serif;
