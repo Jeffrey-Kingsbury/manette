@@ -3,15 +3,31 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 8000;
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword, updateUserData } = require("./loginHandlers");
 const { newActivity, getActivityFeed } = require("./notificationHandlers");
 const { verification } = require("./verification");
-const { getTemplate, getUsers } = require("./ticketHandlers");
+const { postNew, getUsers } = require("./ticketHandlers");
 const morgan = require("morgan");
 const { getProjectData } = require("./dashboardHandlers");
+const bodyParser = require("body-parser");
+const fs = require('fs');
 
 //CONFIGS
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        //IF THE PATH DOES NOT EXIST, CREATE THE FOLDER
+        if (!fs.existsSync(`public/uploads/${req.params.ticketId}/`)) {
+            fs.mkdirSync(`public/uploads/${req.params.ticketId}/`, { recursive: true })
+        }
+        //UPLOAD THE IMAGES TO THIS FOLDER
+        cb(null, `public/uploads/${req.params.ticketId}/`)
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+
+const upload = multer({ storage: storage });
 require('dotenv').config()
 const app = express();
 app.use(express.static('public'))
@@ -20,6 +36,10 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 ///////////////////
 // GET REQUESTS //
 /////////////////
@@ -38,16 +58,19 @@ app.get("/projectData", verification, getProjectData);
 //Get a list of usernames and roles
 app.get("/getUsers", verification, getUsers);
 
-
 ////////////////////
 // POST REQUESTS //
 //////////////////
 app.post("/login", handleLogin);
 app.post("/signup", handleSignup);
-app.post("/sendmail", verification, sendMail);
 app.post("/forgotPassword", forgotPassword);
 app.post("/resetPassword/:token", resetPassword);
-app.post("/notifications", newActivity);
+app.post("/sendmail", verification, sendMail);
+app.post("/notifications", verification, newActivity);
+app.post("/newbug/:ticketId", verification, upload.any(), postNew);
+app.post("*", verification, (req, res) => {
+    res.status(404).send()
+});
 
 //PATCH REQUESTS
 
@@ -56,24 +79,3 @@ app.post("/notifications", newActivity);
 app.listen(PORT, () => {
     console.log("Listening on port", PORT);
 });
-
-
-
-/*
-HOW PROJECT TICKET DATA DEFAULTS ARE STORED:
-
-{"_id":{"$oid":"633c4a6b3833185552ec99f8"},
-"projects":{
-    "Demo - Game":{
-        "components":["UI/UX", "Art", "Audio/SFX", "Audio/Music", "Text", "Programming", "Crash", "General", "Translation"],
-        "severities":["Crash", "Major", "Minor", "Trivial", "Feedback"],
-        "Departments":["FQA", "CQA", "Dev", "Certification", "Localization"]
-    },
-    "Demo - Website":{
-        "components":["UI/UX", "Accesibility", "Art", "Text", "Programming", "Crash", "Backend", "Frontend", "SEO"],
-        "severities":["Crash", "Major", "Minor", "Trivial", "Feedback"],
-        "Departments":["FQA", "Dev", "Marketing", "Localization"]
-    }
-}
-}
-*/

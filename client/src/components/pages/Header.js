@@ -21,10 +21,8 @@ const Header = () => {
       />
       <NavigationWrapper>
         <NewIssueItem onClick={() => { navigate('/new') }}>New ticket</NewIssueItem>
-        <NaigationItem onClick={()=>{fetch('/updateUserData')}}>Project</NaigationItem>
         <NaigationItem onClick={() => { navigate('/') }}>Dashboard</NaigationItem>
-        <NaigationItem>All bugs</NaigationItem>
-        <NaigationItem>Detailed search</NaigationItem>
+        <NaigationItem onClick={() => { navigate('/allbugs') }}>All bugs</NaigationItem>
       </NavigationWrapper>
 
       {/*<SearchBar />*/}

@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 import { FaUserAlt, FaKey } from 'react-icons/fa';
+import { GrNotes } from 'react-icons/gr';
 import { useState } from 'react';
 
-const Input = ({ icon, type, label, placeholder, setValue, required = false, tab = 0 }) => {
+const Input = ({ icon, type, label, placeholder, setValue, required = false, tab = 0, width = "250px" }) => {
 
     const [iconFill, setIconFill] = useState("gray")
-    
     const getIcon = () => {
         switch (icon) {
             case "user":
@@ -14,6 +14,9 @@ const Input = ({ icon, type, label, placeholder, setValue, required = false, tab
             case "password":
                 return <FaKey fill={iconFill} size={20} />
 
+            case "summary":
+                return <GrNotes fill={iconFill} size={20} />
+                
             default:
                 return null;
         }
@@ -21,8 +24,8 @@ const Input = ({ icon, type, label, placeholder, setValue, required = false, tab
 
     return (
         <>
-            <Label>{label}</Label>
-            <InputWrapper>
+            <Label width={width}>{label}</Label>
+            <InputWrapper width={width}>
                 <IconWrapper>
                     {getIcon()}
                 </IconWrapper>
@@ -42,7 +45,7 @@ const Input = ({ icon, type, label, placeholder, setValue, required = false, tab
 };
 
 const Label = styled.label`
-width: 270px;
+width: ${props => props.width};
 margin: 2rem 0 .5rem 0;
 font-size: large;
 user-select: none;
@@ -53,7 +56,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 height: 2.5rem;
-width: 250px;
+width: ${props => props.width};
 border-bottom: 1px solid gray;
 padding: 0 .5rem;
 

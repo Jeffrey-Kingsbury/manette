@@ -5,16 +5,17 @@ import styled from 'styled-components';
 const AllBugsGraph = () =>{
     ChartJS.register(ArcElement, Tooltip, Legend);
     const data = {
-        labels: ['Open bugs', 'Closed bugs', 'Feedback required', 'Waived bugs'],
+        labels: ['New tickets', 'Open tickets', 'Closed tickets', 'Feedback required', 'Waived tickets'],
         datasets: [
             {
-                label: 'Bugs',
-                data: [666, 420, 69, 42],
+                label: 'tickets',
+                data: [0, 0, 0, 0, 0],
                 backgroundColor: [
                     '#A691DB',
                     '#A5D6AF',
                     '#F591CD',
-                    '#FFC894'
+                    '#FFC894',
+                    '#FFF5BD'
                 ]
             },
         ],

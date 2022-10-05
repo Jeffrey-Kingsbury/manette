@@ -7,6 +7,7 @@ import ResetPassword from "./components/pages/ResetPassword";
 import bg from "./images/pastel_bg.jpg";
 import Header from "./components/pages/Header";
 import NewBug from "./components/pages/NewBug";
+import AllBugs from "./components/pages/AllBugs";
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<><Header /><Dashboard /></>} />
             <Route path="/new" element={<><Header /> <NewBug /></>} />
+            <Route path="/allbugs" element={<><Header /> <AllBugs /></>} />
             <Route path="/resetpassword/:token" element={<ResetPassword />} />
           </Routes>
         </Wrapper>
