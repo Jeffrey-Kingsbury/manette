@@ -3,7 +3,7 @@ import { FaUserAlt, FaKey } from 'react-icons/fa';
 import { GrNotes } from 'react-icons/gr';
 import { useState } from 'react';
 
-const Input = ({ icon, type, label, placeholder, setValue, required = false, tab = 0, width = "250px" }) => {
+const Input = ({ icon, type, label, placeholder, setValue, required = false, tab = 0, width = "250px", value="", disabled }) => {
 
     const [iconFill, setIconFill] = useState("gray")
     const getIcon = () => {
@@ -31,6 +31,7 @@ const Input = ({ icon, type, label, placeholder, setValue, required = false, tab
                 </IconWrapper>
 
                 <In
+                    disabled={disabled}
                     type={type}
                     required={required}
                     placeholder={placeholder}
@@ -38,6 +39,7 @@ const Input = ({ icon, type, label, placeholder, setValue, required = false, tab
                     onBlur={() => { setIconFill("gray") }}
                     onFocus={() => { setIconFill("#A691DB") }}
                     tabIndex={tab}
+                    defaultValue={value}
                 />
             </InputWrapper>
         </>

@@ -46,7 +46,7 @@ const newActivity = async (req, res) => {
         const lookupUsername = await db.collection("users").findOne({ username: { $regex: new RegExp(updateUser), $options: "i" } });
         const notificationBody = {
             time: new Date().getTime(),
-            bugNum: bugNum,
+            ticketId: bugNum,
             updateUser: updateUser,
             type:notifType,
             updateUserProfile: {

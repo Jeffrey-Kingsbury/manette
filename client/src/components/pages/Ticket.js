@@ -6,10 +6,12 @@ import { AiOutlineFile } from "react-icons/ai";
 import Loading from "../Loading";
 import ColorButton from "../inputs/ColorButton";
 import Input from "../inputs/Input";
-import { useNavigate } from "react-router";
-import uuid from 'react-uuid';
+import { useNavigate, useParams } from "react-router";
 
 const NewBug = () => {
+
+    const { projectData, allUserData, currentUserData, validate } = useContext(userContext);
+    const { ticketId } = useParams();
     const navigate = useNavigate();
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -24,54 +26,76 @@ const NewBug = () => {
     const [details, setDetails] = useState(false);
     const [notes, setNotes] = useState(false);
     const [attachments, setAttachments] = useState([]);
-    const { projectData, allUserData, currentUserData, validate } = useContext(userContext);
+    const [newAttachments, setNewAttachments] = useState([]);
     const projectNames = Object.keys(projectData);
-    const reporter = currentUserData.username;
-    const newId = uuid();
+    const [reporter, setReporter] = useState(false);
+    const [project, setProject] = useState(false);
+    const [uid, setUid] = useState(false);
+    const [editing, setEditing] = useState(false);
 
     useEffect(() => {
-        setSelectedProject(projectNames[0]);
         validate();
-    }, [projectData]);
-
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(false);
-        setSuccess(false);
-        const attachmentsInput = document.getElementById("attachments");
-        const fd = new FormData();
-        for (let x = 0; x < attachmentsInput.files.length; x++) {
-            fd.append(newId, attachmentsInput.files[x]);
+        const getData = async () => {
+            await fetch('/ticket/' + ticketId)
+                .then(res => res.json())
+                .then(res => {
+                    const { assignee, component, department, details, notes, platform, project, reporter, severity, status, str, submittedDate, uid, summary } = res.data;
+                    setSelectedProject(project);
+                    setDepartment(department);
+                    setAssignee(assignee);
+                    setPlatform(platform);
+                    setSeverity(severity);
+                    setComponent(component);
+                    setSummary(summary);
+                    setStr(str);
+                    setDetails(details);
+                    setNotes(notes);
+                    setReporter(reporter);
+                    setProject(project);
+                    setUid(uid)
+                    setAttachments(res.attachments);
+                })
         };
+        getData();
+    }, [projectData]);
+    console.log(ticketId)
 
-        fd.append("status", "new");
-        fd.append("reporter", reporter);
-        fd.append("project", selectedProject);
-        fd.append("department", department);
-        fd.append("assignee", assignee);
-        fd.append("platform", platform);
-        fd.append("severity", severity);
-        fd.append("component", component);
-        fd.append("summary", summary);
-        fd.append("str", str);
-        fd.append("details", details);
-        fd.append("notes", notes);
-        fd.append("uid", newId);
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setError(false);
+    //     setSuccess(false);
+    //     const attachmentsInput = document.getElementById("attachments");
+    //     const fd = new FormData();
+    //     // for (let x = 0; x < attachmentsInput.files.length; x++) {
+    //     //     fd.append(newId, attachmentsInput.files[x]);
+    //     // };
 
-        await fetch('/newbug/' + newId, {
-            method: "POST",
-            body: fd
-        })
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === 200) {
-                    setSuccess(true);
-                    return;
-                }
-                setError(res.message);
-            })
-    }
+    //     fd.append("status", "new");
+    //     fd.append("reporter", reporter);
+    //     fd.append("project", selectedProject);
+    //     fd.append("department", department);
+    //     fd.append("assignee", assignee);
+    //     fd.append("platform", platform);
+    //     fd.append("severity", severity);
+    //     fd.append("component", component);
+    //     fd.append("summary", summary);
+    //     fd.append("str", str);
+    //     fd.append("details", details);
+    //     fd.append("notes", notes);
+
+    //     await fetch('/newbug/' + newId, {
+    //         method: "POST",
+    //         body: fd
+    //     })
+    //         .then(res => res.json())
+    //         .then(res => {
+    //             if (res.status === 200) {
+    //                 setSuccess(true);
+    //                 return;
+    //             }
+    //             setError(res.message);
+    //         })
+    // }
 
     return (
         <Wrapper>
@@ -108,8 +132,8 @@ const NewBug = () => {
                 {
                     !success &&
                     <>
-                        <Title>Create a ticket</Title>
-                        <Form id="form" onSubmit={(e) => handleSubmit(e)}>
+                        <Title>{ticketId}</Title>
+                        <Form id="form" onSubmit={(e) => console.log(e)}>
                             {error && !success &&
                                 <AfterSubMessage>
                                     <Title style={{ backgroundColor: "#F591CD" }}>Error</Title>
@@ -117,12 +141,17 @@ const NewBug = () => {
                                 </AfterSubMessage>
                             }
                             {!selectedProject && <Loading />}
-                            {selectedProject && allUserData && (
+                            {project && projectData && allUserData && (
                                 <>
                                     <Row>
                                         <Col>
+                                            Reporter:{reporter}
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col>
                                             <Label>Project</Label>
-                                            <Select name="project" onChange={(e) => { setSelectedProject(e.target.value); }}>
+                                            <Select disabled={!editing} name="project" defaultValue={project} onChange={(e) => { setSelectedProject(e.target.value); }}>
                                                 {projectNames.map((e, i) => {
                                                     return (
                                                         <Option value={e} key={e}>
@@ -135,7 +164,7 @@ const NewBug = () => {
 
                                         <Col>
                                             <Label>Department</Label>
-                                            <Select name="department" defaultValue={null} onChange={(e) => { setDepartment(e.target.value); }} required>
+                                            <Select disabled={!editing} name="department" defaultValue={department} onChange={(e) => { setDepartment(e.target.value); }} required>
                                                 <Option value={null}></Option>
                                                 {projectData[selectedProject]["departments"].map((e) => {
                                                     return (
@@ -149,7 +178,7 @@ const NewBug = () => {
 
                                         <Col>
                                             <Label>Assignee</Label>
-                                            <Select name="asignee" defaultValue={null} onChange={(e) => { setAssignee(e.target.value); }} required>
+                                            <Select disabled={!editing} name="asignee" defaultValue={assignee} onChange={(e) => { setAssignee(e.target.value); }} required>
                                                 <Option value={null}></Option>
                                                 {allUserData.map((e) => {
                                                     return (
@@ -165,7 +194,7 @@ const NewBug = () => {
                                     <Row>
                                         <Col>
                                             <Label>Platform</Label>
-                                            <Select multiple name="platform" style={{ height: "150px" }} defaultValue={null} onChange={(e) => {
+                                            <Select disabled={!editing} multiple name="platform" style={{ height: "150px" }} defaultValue={platform.split(",")} onChange={(e) => {
                                                 const options = e.target.options;
                                                 const filtered = []
                                                 Object.keys(options).forEach((i) => {
@@ -187,7 +216,7 @@ const NewBug = () => {
 
                                         <Col>
                                             <Label>Severity</Label>
-                                            <Select name="severity" defaultValue={null} onChange={(e) => { setSeverity(e.target.value); }} required>
+                                            <Select disabled={!editing} name="severity" defaultValue={severity} onChange={(e) => { setSeverity(e.target.value); }} required>
                                                 <Option value={null}></Option>
                                                 {projectData[selectedProject]["severities"].map((e) => {
                                                     return (
@@ -201,7 +230,7 @@ const NewBug = () => {
 
                                         <Col>
                                             <Label>Component</Label>
-                                            <Select name="component" defaultValue={null} onChange={(e) => { setComponent(e.target.value); }} required>
+                                            <Select disabled={!editing} name="component" defaultValue={component} onChange={(e) => { setComponent(e.target.value); }} required>
                                                 <Option value={null}></Option>
                                                 {projectData[selectedProject]["components"].map((e) => {
                                                     return (
@@ -223,38 +252,51 @@ const NewBug = () => {
                                         width="600px"
                                         setValue={setSummary}
                                         required={true}
+                                        value={summary}
+                                        disabled={!editing}
                                     />
 
                                     <Col>
                                         <Label>Steps to reproduce</Label>
-                                        <TextArea name="str" height="100px" onChange={e => setStr(e.target.value)} />
+                                        <TextArea disabled={!editing} name="str" height="100px" value={str} onChange={e => setStr(e.target.value)} />
                                     </Col>
                                     <Col>
                                         <Label>Details</Label>
-                                        <TextArea name="details" height="300px" onChange={e => setDetails(e.target.value)} />
+                                        <TextArea disabled={!editing} name="details" height="300px" value={details} onChange={e => setDetails(e.target.value)} />
                                     </Col>
 
                                     <Col>
                                         <Label>Notes</Label>
-                                        <TextArea name="notes" height="100px" onChange={e => setNotes(e.target.value)} />
+                                        <TextArea disabled={!editing} name="notes" height="100px" value={notes} onChange={e => setNotes(e.target.value)} />
                                     </Col>
 
                                     <Col>
-                                        <Label>Attachments - Allowed types: [jpeg, mp4, .dmp, .txt, .pdf]</Label>
-                                        <CustomFileUpload htmlFor="attachments">
+                                        {/* <Label>Attachments - Allowed types: [jpeg, mp4, .dmp, .txt, .pdf]</Label>
+                                        <CustomFileUpload htmlFor="newAttachments">
                                             <MdOutlineDriveFolderUpload size={30} />Upload</CustomFileUpload>
-                                        <FileUpload id="attachments" name="attachments" type="file" accept="image/jpeg, video/mp4, .dmp, .txt, .pdf" multiple onChange={(e) => { setAttachments(e.target.files) }} />
+                                        <FileUpload id="newAttachments" name="newAttachments" type="file" accept="image/jpeg, video/mp4, .dmp, .txt, .pdf" multiple onChange={(e) => { setNewAttachments(e.target.files) }} /> */}
 
-                                        <Label>Selected files:</Label>
+                                        {/* <Label>New attachments:</Label>
                                         <FileNames>
                                             {
-                                                Object.keys(attachments).map(e => {
-                                                    return <Files key={e}><AiOutlineFile size={30} />{attachments[e].name}</Files>
+                                                Object.keys(newAttachments).map(e => {
+                                                    return <Files key={e}><AiOutlineFile size={30} />{newAttachments[e].name}</Files>
+                                                })
+                                            }
+                                        </FileNames> */}
+
+
+                                        <Label>Attachments:</Label>
+                                        <FileNames>
+                                            {
+                                                attachments.map(e => {
+                                                    console.log(e)
+                                                    return <AttachmentImage key={e} src={`/uploads/${uid}/${e}`} crossOrigin='anonymous' />
                                                 })
                                             }
                                         </FileNames>
                                     </Col>
-                                    <ButtonWrapper>
+                                    {/* <ButtonWrapper>
                                         <ColorButton
                                             color="#A691DB"
                                             text="Submit"
@@ -263,7 +305,7 @@ const NewBug = () => {
                                             width="50%"
                                             height="3.5rem"
                                         />
-                                    </ButtonWrapper>
+                                    </ButtonWrapper> */}
                                 </>
                             )}
                         </Form>
@@ -273,6 +315,10 @@ const NewBug = () => {
         </Wrapper>
     );
 };
+
+const AttachmentImage = styled.img`
+max-width: 200px;
+`;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -403,6 +449,7 @@ const FileNames = styled.ul`
 width: 600px;
 min-height: 10px;
 border: 1px solid;
+margin: 1rem 0;
 `;
 const Files = styled.li`
 margin: .5rem 2rem;

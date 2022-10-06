@@ -22,7 +22,7 @@ const Header = () => {
       <NavigationWrapper>
         <NewIssueItem onClick={() => { navigate('/new') }}>New ticket</NewIssueItem>
         <NaigationItem onClick={() => { navigate('/') }}>Dashboard</NaigationItem>
-        <NaigationItem onClick={() => { navigate('/allbugs') }}>All bugs</NaigationItem>
+        <NaigationItem onClick={() => { navigate('/alltickets') }}>All tickets</NaigationItem>
       </NavigationWrapper>
 
       {/*<SearchBar />*/}

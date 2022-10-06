@@ -6,7 +6,7 @@ const multer = require('multer');
 const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword, updateUserData } = require("./loginHandlers");
 const { newActivity, getActivityFeed } = require("./notificationHandlers");
 const { verification } = require("./verification");
-const { postNew, getUsers } = require("./ticketHandlers");
+const { postNew, getUsers, getAllTickets, getSpecificTicket } = require("./ticketHandlers");
 const morgan = require("morgan");
 const { getProjectData } = require("./dashboardHandlers");
 const bodyParser = require("body-parser");
@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
         //IF THE PATH DOES NOT EXIST, CREATE THE FOLDER
         if (!fs.existsSync(`public/uploads/${req.params.ticketId}/`)) {
             fs.mkdirSync(`public/uploads/${req.params.ticketId}/`, { recursive: true })
-        }
+        } 
         //UPLOAD THE IMAGES TO THIS FOLDER
         cb(null, `public/uploads/${req.params.ticketId}/`)
     },
@@ -30,11 +30,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 require('dotenv').config()
 const app = express();
-app.use(express.static('public'))
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
+app.use(express.static('public'))
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
@@ -57,6 +57,10 @@ app.get("/activityFeed", verification, getActivityFeed);
 app.get("/projectData", verification, getProjectData);
 //Get a list of usernames and roles
 app.get("/getUsers", verification, getUsers);
+//Get a list of all tickets
+app.get("/getalltickets", verification, getAllTickets);
+//Get specific ticket data
+app.get("/ticket/:ticketId", verification, getSpecificTicket);
 
 ////////////////////
 // POST REQUESTS //
@@ -68,9 +72,7 @@ app.post("/resetPassword/:token", resetPassword);
 app.post("/sendmail", verification, sendMail);
 app.post("/notifications", verification, newActivity);
 app.post("/newbug/:ticketId", verification, upload.any(), postNew);
-app.post("*", verification, (req, res) => {
-    res.status(404).send()
-});
+
 
 //PATCH REQUESTS
 

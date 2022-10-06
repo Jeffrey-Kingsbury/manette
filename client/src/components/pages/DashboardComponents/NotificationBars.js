@@ -5,34 +5,34 @@ import { FaFileUpload } from "react-icons/fa";
 
 const NotificationBars = ({ notif }) => {
     const { role, firstName, lastName, avatarSrc } = notif.updateUserProfile;
-    const { bugNum, time, type, updateUser } = notif;
+    const { ticketId, time, type, updateUser, submittedDate } = notif;
 
     const getNotification = () => {
         switch (type.toUpperCase()) {
             case "NEWBUG":
                 return (
                     <Message>
-                        Created a new ticket. <a>{bugNum}</a>
+                        Created a new ticket. <a href={`/ticket/${ticketId}`}>{ticketId}</a>
                     </Message>
                 );
 
             case "UPDATEBUG":
                 return (
                     <Message>
-                        Updated ticket <a>{bugNum}</a>
+                        Updated ticket <a href={`/ticket/${ticketId}`}>{ticketId}</a>
                     </Message>
                 );
             case "ADDCOMMENT":
                 return (
                     <Message>
-                        Added a comment to <a>{bugNum}</a>
+                        Added a comment to <a href={`/ticket/${ticketId}`}>{ticketId}</a>
                     </Message>
                 );
 
             case "ADDATTACHMENT":
                 return (
                     <Message>
-                        Added attachments to <a>{bugNum}</a>
+                        Added attachments to <a href={`/ticket/${ticketId}`}>{ticketId}</a>
                     </Message>
                 );
 
@@ -82,6 +82,7 @@ const NotificationBars = ({ notif }) => {
                     {firstName} {lastName.slice(0, 1)}. ({role})
                 </Name>
                 {getNotification()}
+                {submittedDate}
             </MessageWrapper>
             <IconWrapper>{getIcon()}</IconWrapper>
         </Wrapper>
