@@ -8,7 +8,7 @@ import ColorButton from "../inputs/ColorButton";
 import Input from "../inputs/Input";
 import { useNavigate, useParams } from "react-router";
 
-const NewBug = () => {
+const Ticket = () => {
 
     const { projectData, allUserData, currentUserData, validate } = useContext(userContext);
     const { ticketId } = useParams();
@@ -32,9 +32,11 @@ const NewBug = () => {
     const [project, setProject] = useState(false);
     const [uid, setUid] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [status, setStatus] = useState(false);
 
     useEffect(() => {
         validate();
+
         const getData = async () => {
             await fetch('/ticket/' + ticketId)
                 .then(res => res.json())
@@ -43,7 +45,7 @@ const NewBug = () => {
                     setSelectedProject(project);
                     setDepartment(department);
                     setAssignee(assignee);
-                    setPlatform(platform);
+                    setPlatform(platform.split(","));
                     setSeverity(severity);
                     setComponent(component);
                     setSummary(summary);
@@ -54,48 +56,50 @@ const NewBug = () => {
                     setProject(project);
                     setUid(uid)
                     setAttachments(res.attachments);
+                    setStatus(status);
+                    console.log(uid)
                 })
         };
         getData();
     }, [projectData]);
-    console.log(ticketId)
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     setError(false);
-    //     setSuccess(false);
-    //     const attachmentsInput = document.getElementById("attachments");
-    //     const fd = new FormData();
-    //     // for (let x = 0; x < attachmentsInput.files.length; x++) {
-    //     //     fd.append(newId, attachmentsInput.files[x]);
-    //     // };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(false);
+        setSuccess(false);
+        const attachmentsInput = document.getElementById("newAttachments");
+        const fd = new FormData();
+        for (let x = 0; x < attachmentsInput.files.length; x++) {
+            fd.append(uid, attachmentsInput.files[x]);
+        };
 
-    //     fd.append("status", "new");
-    //     fd.append("reporter", reporter);
-    //     fd.append("project", selectedProject);
-    //     fd.append("department", department);
-    //     fd.append("assignee", assignee);
-    //     fd.append("platform", platform);
-    //     fd.append("severity", severity);
-    //     fd.append("component", component);
-    //     fd.append("summary", summary);
-    //     fd.append("str", str);
-    //     fd.append("details", details);
-    //     fd.append("notes", notes);
-
-    //     await fetch('/newbug/' + newId, {
-    //         method: "POST",
-    //         body: fd
-    //     })
-    //         .then(res => res.json())
-    //         .then(res => {
-    //             if (res.status === 200) {
-    //                 setSuccess(true);
-    //                 return;
-    //             }
-    //             setError(res.message);
-    //         })
-    // }
+        fd.append("status", status);
+        fd.append("reporter", reporter);
+        fd.append("project", selectedProject);
+        fd.append("department", department);
+        fd.append("assignee", assignee);
+        fd.append("platform", platform);
+        fd.append("severity", severity);
+        fd.append("component", component);
+        fd.append("summary", summary);
+        fd.append("str", str);
+        fd.append("details", details);
+        fd.append("notes", notes);
+        fd.append("uid", uid);
+        fd.append("ticketId", ticketId);
+        await fetch('/updateticket/' + uid, {
+            method: "POST",
+            body: fd
+        })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status === 200) {
+                    setSuccess(true);
+                    return;
+                }
+                setError(res.message);
+            })
+    }
 
     return (
         <Wrapper>
@@ -133,7 +137,7 @@ const NewBug = () => {
                     !success &&
                     <>
                         <Title>{ticketId}</Title>
-                        <Form id="form" onSubmit={(e) => console.log(e)}>
+                        <Form id="form" onSubmit={(e) => handleSubmit(e)}>
                             {error && !success &&
                                 <AfterSubMessage>
                                     <Title style={{ backgroundColor: "#F591CD" }}>Error</Title>
@@ -145,8 +149,25 @@ const NewBug = () => {
                                 <>
                                     <Row>
                                         <Col>
-                                            Reporter:{reporter}
+                                            Reporter: {reporter}
                                         </Col>
+                                        <Col>
+                                            <Label>Status</Label>
+                                            <Select disabled={!editing} name="status" defaultValue={status} onChange={(e) => { setStatus(e.target.value); }}>
+                                                <Option value={"new"}>New</Option>
+                                                <Option value={"open"}>Open</Option>
+                                                <Option value={"resolved"}>Resolved</Option>
+                                                <Option value={"feedback"}>Feedback required</Option>
+                                                <Option value={"waived"}>Waived</Option>
+                                                <Option value={"closed"}>Closed</Option>
+                                            </Select>
+                                        </Col>
+                                        <Col>
+                                            Edit:
+                                            <input type="checkbox" onChange={() => { setEditing(!editing) }} />
+
+                                        </Col>
+
                                     </Row>
                                     <Row>
                                         <Col>
@@ -194,7 +215,7 @@ const NewBug = () => {
                                     <Row>
                                         <Col>
                                             <Label>Platform</Label>
-                                            <Select disabled={!editing} multiple name="platform" style={{ height: "150px" }} defaultValue={platform.split(",")} onChange={(e) => {
+                                            <Select disabled={!editing} multiple name="platform" style={{ height: "150px" }} defaultValue={platform} onChange={(e) => {
                                                 const options = e.target.options;
                                                 const filtered = []
                                                 Object.keys(options).forEach((i) => {
@@ -271,32 +292,43 @@ const NewBug = () => {
                                     </Col>
 
                                     <Col>
-                                        {/* <Label>Attachments - Allowed types: [jpeg, mp4, .dmp, .txt, .pdf]</Label>
-                                        <CustomFileUpload htmlFor="newAttachments">
-                                            <MdOutlineDriveFolderUpload size={30} />Upload</CustomFileUpload>
-                                        <FileUpload id="newAttachments" name="newAttachments" type="file" accept="image/jpeg, video/mp4, .dmp, .txt, .pdf" multiple onChange={(e) => { setNewAttachments(e.target.files) }} /> */}
 
-                                        {/* <Label>New attachments:</Label>
-                                        <FileNames>
-                                            {
-                                                Object.keys(newAttachments).map(e => {
-                                                    return <Files key={e}><AiOutlineFile size={30} />{newAttachments[e].name}</Files>
-                                                })
-                                            }
-                                        </FileNames> */}
-
+                                        {editing &&
+                                            <>
+                                                <Label>Attachments - Allowed types: [jpeg, mp4, .dmp, .txt, .pdf]</Label>
+                                                <CustomFileUpload htmlFor="newAttachments">
+                                                    <MdOutlineDriveFolderUpload size={30} />Upload
+                                                </CustomFileUpload>
+                                                <FileUpload id="newAttachments" name="newAttachments" type="file" accept="image/jpeg, video/mp4, .dmp, .txt, .pdf" multiple onChange={(e) => { setNewAttachments(e.target.files) }} />
+                                                <Label>New attachments:</Label>
+                                                <FileNames>
+                                                    {
+                                                        Object.keys(newAttachments).map(e => {
+                                                            return <Files key={e}><AiOutlineFile size={30} />{newAttachments[e].name}</Files>
+                                                        })
+                                                    }
+                                                </FileNames>
+                                            </>
+                                        }
 
                                         <Label>Attachments:</Label>
                                         <FileNames>
                                             {
                                                 attachments.map(e => {
-                                                    console.log(e)
-                                                    return <AttachmentImage key={e} src={`/uploads/${uid}/${e}`} crossOrigin='anonymous' />
+                                                    return <AttachmentImage key={e} src={`/uploads/${uid}/${e}`} onClick={() => {
+                                                        if (!editing) {
+                                                            window.open(`/uploads/${uid}/${e}`, '_blank')
+                                                        }else{
+                                                           const deleteImage = window.confirm("are you sure you want to delete this attachment? \nTHIS ACTION CANNOT BE UNDONE");
+                                                        }
+                                                    }
+                                                    } crossOrigin='anonymous' />
                                                 })
                                             }
                                         </FileNames>
                                     </Col>
-                                    {/* <ButtonWrapper>
+
+                                    <ButtonWrapper>
                                         <ColorButton
                                             color="#A691DB"
                                             text="Submit"
@@ -304,8 +336,9 @@ const NewBug = () => {
                                             type="submit"
                                             width="50%"
                                             height="3.5rem"
+                                            disabled={!editing}
                                         />
-                                    </ButtonWrapper> */}
+                                    </ButtonWrapper>
                                 </>
                             )}
                         </Form>
@@ -455,4 +488,4 @@ const Files = styled.li`
 margin: .5rem 2rem;
 `;
 
-export default NewBug;
+export default Ticket;

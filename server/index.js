@@ -6,7 +6,7 @@ const multer = require('multer');
 const { sendMail, handleLogin, handleSignup, forgotPassword, resetPassword, validateResetPassword, updateUserData } = require("./loginHandlers");
 const { newActivity, getActivityFeed } = require("./notificationHandlers");
 const { verification } = require("./verification");
-const { postNew, getUsers, getAllTickets, getSpecificTicket } = require("./ticketHandlers");
+const { postNew, getUsers, getAllTickets, getSpecificTicket, updateTicket } = require("./ticketHandlers");
 const morgan = require("morgan");
 const { getProjectData } = require("./dashboardHandlers");
 const bodyParser = require("body-parser");
@@ -72,7 +72,7 @@ app.post("/resetPassword/:token", resetPassword);
 app.post("/sendmail", verification, sendMail);
 app.post("/notifications", verification, newActivity);
 app.post("/newbug/:ticketId", verification, upload.any(), postNew);
-
+app.post("/updateticket/:ticketId", verification, upload.any(), updateTicket);
 
 //PATCH REQUESTS
 
