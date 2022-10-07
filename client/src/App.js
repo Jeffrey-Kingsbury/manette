@@ -6,7 +6,7 @@ import UserContext from './UserContext';
 import ResetPassword from "./components/pages/ResetPassword";
 import bg from "./images/pastel_bg.jpg";
 import Header from "./components/pages/Header";
-import NewBug from "./components/pages/newBug";
+import NewBug from "./components/pages/NewBug";
 import AllTickets from "./components/pages/AllTickets";
 import Ticket from "./components/pages/Ticket";
 
