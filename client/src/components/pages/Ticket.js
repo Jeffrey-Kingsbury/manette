@@ -34,6 +34,21 @@ const Ticket = () => {
     const [editing, setEditing] = useState(false);
     const [status, setStatus] = useState(false);
 
+    const deleteAttachment = async (img) => {
+        const confirm = window.confirm(`are you sure you want to delete ${img}? \nTHIS ACTION CANNOT BE UNDONE`);
+        if (confirm) {
+            await fetch(`/deleteAttachment/${uid}/${img}`, { method: "delete" })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 500) {
+                        alert("An error occurred. Please refresh the page and try again");
+                        return;
+                    }
+                    document.getElementById(img).remove();
+                })
+        }
+    };
+
     useEffect(() => {
         validate();
 
@@ -315,14 +330,26 @@ const Ticket = () => {
                                         <FileNames>
                                             {
                                                 attachments.map(e => {
-                                                    return <AttachmentImage key={e} src={`/uploads/${uid}/${e}`} onClick={() => {
-                                                        if (!editing) {
-                                                            window.open(`/uploads/${uid}/${e}`, '_blank')
-                                                        }else{
-                                                           const deleteImage = window.confirm("are you sure you want to delete this attachment? \nTHIS ACTION CANNOT BE UNDONE");
+                                                    console.log(e.slice(-3))
+                                                    if (e.slice(-3) === "jpg") {
+
+                                                        return <AttachmentImage id={e} key={e} src={`/uploads/${uid}/${e}`} onClick={() => {
+                                                            if (!editing) {
+                                                                window.open(`http://localhost:8000/uploads/${uid}/${e}`, '_blank')
+                                                            } else {
+                                                                deleteAttachment(e);
+                                                            }
                                                         }
+                                                        } crossOrigin='anonymous' />
+                                                    } else {
+                                                        return <a key={e} id={e} target={!editing ? "_blank" : ""} download={!editing} href={!editing ? `http://localhost:8000/uploads/${uid}/${e}` : ""} onClick={() => {
+                                                            if (!editing) {
+                                                                window.open(`http://localhost:8000/uploads/${uid}/${e}`, '_blank')
+                                                            } else {
+                                                                deleteAttachment(e);
+                                                            }
+                                                        }}>{e}</a>
                                                     }
-                                                    } crossOrigin='anonymous' />
                                                 })
                                             }
                                         </FileNames>

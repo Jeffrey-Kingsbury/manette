@@ -99,6 +99,31 @@ app.post('/updateticket/:ticketId', verification, upload.any(), updateTicket);
 
 // DELETE REQUESTS
 
+// Delete image attachments
+app.delete('/deleteAttachment/:uid/:attachmentId', verification, (req, res) => {
+  // Remove the specific file.
+  fs.unlink(
+    `public/uploads/${req.params.uid}/${req.params.attachmentId}`,
+    (err) => {
+      if (err) {
+        res.status(500).json({ status: 500, error: err });
+      } else {
+        res.status(200).json({ status: 200, message: 'success' });
+        // Cleanup. If the folder is empty, delete the folder.
+        fs.readdir(`public/uploads/${req.params.uid}`, (error, files) => {
+          if (error) {
+            console.log(error);
+          } else if (!files.length) {
+            fs.rmdir(`public/uploads/${req.params.uid}`, (error2) => {
+              if (error2) console.log(error2);
+            });
+          }
+        });
+      }
+    }
+  );
+});
+
 app.listen(PORT, () => {
   console.log('Listening on port', PORT);
 });

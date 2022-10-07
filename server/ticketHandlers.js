@@ -174,9 +174,8 @@ const updateTicket = async (req, res) => {
   try {
     // Connect to mongo
     await client.connect();
-
-    await db.collection('tickets').findOneAndUpdate(
-      { uid: Number(ticket.uid) },
+    const updated = await db.collection('tickets').findOneAndUpdate(
+      { uid: ticket.uid },
       {
         $set: {
           status: ticket.status,
@@ -192,7 +191,7 @@ const updateTicket = async (req, res) => {
         },
       }
     );
-
+    console.log(updated);
     return;
   } catch (err) {
     console.log(err);

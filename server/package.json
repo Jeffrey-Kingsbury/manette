@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Backend for Manette",
   "main": "index.js",
-  "proxy": "localhost:3000",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
