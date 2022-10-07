@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import logo from "../../images/manette_logo.png";
 import { AiFillSetting } from "react-icons/ai";
-import SearchBar from "../inputs/SearchBar";
+import { GiBugleCall } from "react-icons/gi";
 import { useNavigate } from "react-router";
 import SettingsDropdown from '../inputs/SettingsDropdown';
 import { useState, useContext, useEffect } from "react";
@@ -11,6 +11,26 @@ const Header = () => {
   const navigate = useNavigate();
   const [settingsActive, setSettingsActive] = useState(false);
   const { currentUserData } = useContext(userContext);
+  const sendShout = () => {
+    const shout = prompt("What would you like to shout?");
+    if (shout.trim().length > 0) {
+      fetch('/shout', {
+        method: "post",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(
+          {
+            message: shout,
+            user: currentUserData.username,
+            firstName: currentUserData.firstName,
+            lastName: currentUserData.lastName,
+            avatarSrc: currentUserData.avatarSrc,
+            role:currentUserData.role
+          }
+        )
+      })
+      navigate(0);
+    }
+  }
 
   return (
     <Wrapper>
@@ -25,11 +45,11 @@ const Header = () => {
         <NaigationItem onClick={() => { navigate('/alltickets') }}>All tickets</NaigationItem>
       </NavigationWrapper>
 
-      {/*<SearchBar />*/}
+      <Shout onClick={() => { sendShout() }}><p>Shout</p><GiBugleCall size={45} fill="purple" /></Shout>
 
       <SettingsWrapper>
         <UserDataWrapper>
-    
+
           {currentUserData && currentUserData.avatarSrc &&
             <UserAvatar
               alt={currentUserData.firstName + "'s avatar image"}
@@ -193,5 +213,23 @@ const Logo = styled.img`
   user-select: none;
   transition: all ease-in-out 0.2s;
   margin-left: 1rem;
+`;
+
+const Shout = styled.span`
+display: flex;
+width: 180px;
+justify-content: space-between;
+padding: 0 1rem;
+align-items: center;
+font-size: x-large;
+cursor: pointer;
+height: 70%;
+border: 2px solid;
+box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.3);
+transition: all .2s ease-in-out;
+
+&:hover{
+  transform: scale(1.03);
+}
 `;
 export default Header;

@@ -64,7 +64,7 @@ height: 100%;
 overflow: auto;
 display: flex;
 margin: 0 auto;
-flex-direction: column-reverse;
+flex-direction: column;
 align-items: center;
 padding-top: .5rem;
 `;

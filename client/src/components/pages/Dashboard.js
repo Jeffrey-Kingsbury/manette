@@ -1,5 +1,5 @@
 import { userContext } from "../../UserContext";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import Loading from "../Loading";
 import styled from "styled-components";
 import YourBugsGraph from "./DashboardComponents/YourBugsGraph";
@@ -7,45 +7,74 @@ import AllBugsGraph from "./DashboardComponents/AllBugsGraph";
 import ActivityFeed from "./DashboardComponents/ActivityFeed";
 
 const Dashboard = () => {
-    const { userAuthenticated, validate } = useContext(userContext);
-    useEffect(() => {
-        validate();
-    }, []);
+  const { userAuthenticated, validate, currentUserData } = useContext(userContext);
+  const [userOpenTickets, setUserOpenTickets] = useState(false);
+  useEffect(() => {
+    validate();
 
-    return (
-        <Wrapper>
-            {!userAuthenticated && <Loading />}
-            {userAuthenticated && (
-                <>
-                    <DashboardWrapper>
-                        <YourBugsWrapper>
-                        <Title>Your open tickets</Title>
+    const getTickets = async () => {
+      await fetch(`/getalltickets/user/${currentUserData.username}`)
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.status === 200) {
+            setUserOpenTickets(res.data);
+          }
+        });
 
-                      <YouBugsContainer>
+      }
+      getTickets();
 
-                      </YouBugsContainer>
-                        </YourBugsWrapper>
 
-                        <RightSideWrapper>
-                            <ActivityFeed />
+  }, []);
 
-                            <GraphWrapper>
-                                <BugsGraphWrapper>
-                                <Title>All tickets</Title>
-                                    <AllBugsGraph />
-                                </BugsGraphWrapper>
 
-                                <BugsGraphWrapper>
-                                    <Title>Your tickets</Title>
-                                    <YourBugsGraph />
-                                </BugsGraphWrapper>
-                            </GraphWrapper>
-                        </RightSideWrapper>
-                    </DashboardWrapper>
-                </>
-            )}
-        </Wrapper>
-    );
+  return (
+    <Wrapper>
+      {!userAuthenticated && <Loading />}
+      {userAuthenticated && (
+        <>
+          <DashboardWrapper>
+            <YourBugsWrapper>
+              <Title>Your open tickets</Title>
+              <YouBugsContainer>
+                {Object.keys(userOpenTickets).map(e =>{
+                  if(userOpenTickets[e].status !== 'closed'){
+                    return <YourBugsIndividualWrapper key={userOpenTickets[e].ticketId} href={`/ticket/${userOpenTickets[e].ticketId}`}>
+                      <YourBugsIndividualIdContainer>
+                      <p>{userOpenTickets[e].ticketId}</p>
+                      <Small>{userOpenTickets[e].status}</Small>
+                      </YourBugsIndividualIdContainer>
+                      <YourBugsIndividualNameContainer>
+                      <p>{userOpenTickets[e].summary}</p>
+                      <Small>Submitted on: {userOpenTickets[e].submittedDate}</Small>
+                      </YourBugsIndividualNameContainer>
+                    </YourBugsIndividualWrapper>
+                  }
+                })}
+
+              </YouBugsContainer>
+            </YourBugsWrapper>
+
+            <RightSideWrapper>
+              <ActivityFeed />
+
+              <GraphWrapper>
+                <BugsGraphWrapper>
+                  <Title>All tickets</Title>
+                  <AllBugsGraph />
+                </BugsGraphWrapper>
+
+                <BugsGraphWrapper>
+                  <Title>Your tickets</Title>
+                  <YourBugsGraph />
+                </BugsGraphWrapper>
+              </GraphWrapper>
+            </RightSideWrapper>
+          </DashboardWrapper>
+        </>
+      )}
+    </Wrapper>
+  );
 };
 
 const Wrapper = styled.div`
@@ -55,6 +84,10 @@ const Wrapper = styled.div`
   position: relative;
   justify-content: center;
   align-items: center;
+`;
+const Small = styled.p`
+font-size: smaller;
+margin: 0.25rem 0;
 `;
 
 const DashboardWrapper = styled.div`
@@ -83,7 +116,37 @@ const YourBugsWrapper = styled.div`
 const YouBugsContainer = styled.div`
 width: 100%;
 height: 100%;
-overflow: scroll;
+`;
+
+const YourBugsIndividualWrapper = styled.a`
+width: 100%;
+height: 4rem;
+border-bottom: 2px solid;
+display: flex;
+justify-content: space-between;
+align-items: center;
+cursor: pointer;
+transition: all .2s ease-in-out;
+&:hover{
+  transform: scale(1.03);
+}
+`;
+
+const YourBugsIndividualIdContainer = styled.div`
+display: flex;
+flex-direction: column;
+width: 30%;
+height: 100%;
+justify-content: center;
+align-items: center;
+`;
+
+const YourBugsIndividualNameContainer = styled.div`
+width: 100%;
+height: 100%;
+display: flex;
+flex-direction: column;
+justify-content: center;
 `;
 
 const RightSideWrapper = styled.div`

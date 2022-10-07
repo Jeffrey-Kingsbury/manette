@@ -14,7 +14,6 @@ const Ticket = () => {
     const { ticketId } = useParams();
     const navigate = useNavigate();
     const [error, setError] = useState(false);
-    const [success, setSuccess] = useState(false);
     const [selectedProject, setSelectedProject] = useState(false);
     const [department, setDepartment] = useState(false);
     const [assignee, setAssignee] = useState(false);
@@ -81,7 +80,6 @@ const Ticket = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(false);
-        setSuccess(false);
         const attachmentsInput = document.getElementById("newAttachments");
         const fd = new FormData();
         for (let x = 0; x < attachmentsInput.files.length; x++) {
@@ -109,7 +107,7 @@ const Ticket = () => {
             .then(res => res.json())
             .then(res => {
                 if (res.status === 200) {
-                    setSuccess(true);
+                    navigate(0);
                     return;
                 }
                 setError(res.message);
@@ -119,41 +117,11 @@ const Ticket = () => {
     return (
         <Wrapper>
             <Container>
-                {!error && success &&
-                    <AfterSubMessage>
-                        <Title>Success!</Title>
-                        <AfterButtons>
 
-                            <ButtonWrapper>
-                                <ColorButton
-                                    color="#A5D6AF"
-                                    text="Submit another"
-                                    textColor="white"
-                                    type="submit"
-                                    width="30%"
-                                    height="3.5rem"
-                                    func={() => navigate(0)}
-                                />
-
-                                <ColorButton
-                                    color="#FFC894"
-                                    text="Return to dashboard"
-                                    textColor="white"
-                                    type="submit"
-                                    width="30%"
-                                    height="3.5rem"
-                                    func={() => navigate('/')}
-                                />
-                            </ButtonWrapper>
-                        </AfterButtons>
-                    </AfterSubMessage>
-                }
-                {
-                    !success &&
                     <>
                         <Title>{ticketId}</Title>
                         <Form id="form" onSubmit={(e) => handleSubmit(e)}>
-                            {error && !success &&
+                            {error &&
                                 <AfterSubMessage>
                                     <Title style={{ backgroundColor: "#F591CD" }}>Error</Title>
                                     <ErrorMessage>ERROR</ErrorMessage>
@@ -370,7 +338,6 @@ const Ticket = () => {
                             )}
                         </Form>
                     </>
-                }
             </Container>
         </Wrapper>
     );

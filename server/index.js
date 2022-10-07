@@ -15,7 +15,11 @@ const {
   validateResetPassword,
   updateUserData,
 } = require('./loginHandlers');
-const { newActivity, getActivityFeed } = require('./notificationHandlers');
+const {
+  newActivity,
+  getActivityFeed,
+  shout,
+} = require('./notificationHandlers');
 const { verification } = require('./verification');
 const {
   postNew,
@@ -23,6 +27,7 @@ const {
   getAllTickets,
   getSpecificTicket,
   updateTicket,
+  getTicketsByUser,
 } = require('./ticketHandlers');
 const { getProjectData } = require('./dashboardHandlers');
 
@@ -82,6 +87,8 @@ app.get('/getUsers', verification, getUsers);
 app.get('/getalltickets', verification, getAllTickets);
 // Get specific ticket data
 app.get('/ticket/:ticketId', verification, getSpecificTicket);
+// Get all tickets by user
+app.get('/getalltickets/user/:username', verification, getTicketsByUser);
 
 /// /////////////////
 // POST REQUESTS //
@@ -94,6 +101,7 @@ app.post('/sendmail', verification, sendMail);
 app.post('/notifications', verification, newActivity);
 app.post('/newbug/:ticketId', verification, upload.any(), postNew);
 app.post('/updateticket/:ticketId', verification, upload.any(), updateTicket);
+app.post('/shout', verification, shout);
 
 // PATCH REQUESTS
 

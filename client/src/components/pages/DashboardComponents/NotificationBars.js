@@ -5,7 +5,7 @@ import { FaFileUpload } from "react-icons/fa";
 
 const NotificationBars = ({ notif }) => {
     const { role, firstName, lastName, avatarSrc } = notif.updateUserProfile;
-    const { ticketId, time, type, updateUser, submittedDate } = notif;
+    const { ticketId, type, submittedDate } = notif;
 
     const getNotification = () => {
         switch (type.toUpperCase()) {

@@ -86,7 +86,7 @@ const TicketContainer = styled.ul`
 const IndividualTicketContainer = styled.li`
   width: 100%;
   height: 5rem;
-  border: 2px solid #a5d6af;
+  border: 2px solid #A691DB;
   border-radius: 5px;
   position: relative;
   display: flex;

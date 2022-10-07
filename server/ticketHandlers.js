@@ -129,6 +129,29 @@ const getAllTickets = async (req, res) => {
   }
 };
 
+const getTicketsByUser = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const db = client.db('Manette');
+  const user = req.params.username;
+
+  try {
+    // Connect to mongo
+    await client.connect();
+
+    const lookup = await db
+      .collection('tickets')
+      .find({ reporter: user })
+      .toArray();
+
+    res.status(200).json({ status: 200, success: true, data: lookup });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: 500, data: req.body, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
 const getSpecificTicket = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const db = client.db('Manette');
@@ -191,7 +214,8 @@ const updateTicket = async (req, res) => {
         },
       }
     );
-    console.log(updated);
+
+    res.status(200).json({ status: 200, data: updated });
     return;
   } catch (err) {
     console.log(err);
@@ -207,4 +231,5 @@ module.exports = {
   getAllTickets,
   getSpecificTicket,
   updateTicket,
+  getTicketsByUser,
 };

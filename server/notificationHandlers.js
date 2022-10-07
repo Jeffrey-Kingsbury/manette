@@ -85,6 +85,7 @@ const getActivityFeed = async (req, res) => {
       .collection('activity_feed')
       .find()
       .limit(15)
+      .sort({ submittedDate: 1 })
       .toArray();
 
     res.status(200).json({ status: 200, success: true, activityFeed: lookup });
@@ -96,4 +97,49 @@ const getActivityFeed = async (req, res) => {
   }
 };
 
-module.exports = { newActivity, getActivityFeed };
+const shout = async (req, res) => {
+  const { message, user, firstName, lastName, avatarSrc, role } = req.body;
+  const client = new MongoClient(MONGO_URI, options);
+  const db = client.db('Manette');
+
+  const notificationBody = {
+    time: new Date().getTime(),
+    ticketId: 0,
+    updateUser: user,
+    type: 'SHOUT',
+    shoutMessage: message,
+    updateUserProfile: {
+      // eslint-disable-next-line object-shorthand
+      role: role,
+      // eslint-disable-next-line object-shorthand
+      firstName: firstName,
+      // eslint-disable-next-line object-shorthand
+      lastName: lastName,
+      // eslint-disable-next-line object-shorthand
+      avatarSrc: avatarSrc,
+    },
+  };
+
+  try {
+    // Connect to mongo
+    await client.connect();
+    const addNotif = await db
+      .collection('activity_feed')
+      .insertOne(notificationBody);
+    if (!addNotif) {
+      res
+        .status(400)
+        .json({ status: 400, message: 'An error occurred, please try again.' });
+      return;
+    }
+
+    res.status(200).json({ status: 200, success: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ status: 500, data: req.body, message: err.message });
+  } finally {
+    client.close();
+  }
+};
+
+module.exports = { newActivity, getActivityFeed, shout };
