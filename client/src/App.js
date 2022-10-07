@@ -1,6 +1,6 @@
-import Login from "./components/pages/Login";
-import styled from "styled-components";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import styled from "styled-components";
+import Login from "./components/pages/Login";
 import Dashboard from "./components/pages/Dashboard";
 import UserContext from './UserContext';
 import ResetPassword from "./components/pages/ResetPassword";

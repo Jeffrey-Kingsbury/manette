@@ -1,23 +1,23 @@
 const jwt = require('jsonwebtoken');
 
+// eslint-disable-next-line consistent-return
 function verification(req, res, next) {
-    const token = req.cookies['token'];
-    
-    if (!token) return res.status(401).json({ status: 401, error: "Auth token missing." });
+  const { token } = req.cookies;
 
-    try {
-        jwt.verify(token, process.env.JWTPRIVATE, (err, decoded) => {
-            res.locals.currentUserData = decoded;
-        });
+  if (!token)
+    return res.status(401).json({ status: 401, error: 'Auth token missing.' });
 
-        next();
+  try {
+    jwt.verify(token, process.env.JWTPRIVATE, (err, decoded) => {
+      res.locals.currentUserData = decoded;
+    });
 
-
-    } catch (err) {
-        console.log(err)
-        res.status(401).json({ status: 401, error: "Auth token invalid." })
-    }
-
-};
+    next();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+    res.status(401).json({ status: 401, error: 'Auth token invalid.' });
+  }
+}
 
 module.exports = { verification };
