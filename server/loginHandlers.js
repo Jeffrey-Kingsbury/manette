@@ -180,7 +180,9 @@ const handleLogin = async (req, res) => {
     await client.connect();
 
     // Find the user based on username
-    const lookup = await db.collection('users').findOne({ username: user });
+    const lookup = await db
+      .collection('users')
+      .findOne({ username: { $regex: new RegExp(user), $options: 'i' } });
     if (!lookup) {
       res
         .status(400)
@@ -205,6 +207,7 @@ const handleLogin = async (req, res) => {
             firstName: lookup.firstName,
             lastName: lookup.lastName,
             avatarSrc: lookup.avatarSrc,
+            role: lookup.role,
           },
         },
         process.env.JWTPRIVATE
@@ -366,7 +369,9 @@ const updateUserData = async (req, res) => {
     await client.connect();
 
     // Find the user based on username
-    const lookup = await db.collection('users').findOne({ username: user });
+    const lookup = await db
+      .collection('users')
+      .findOne({ username: { $regex: new RegExp(user), $options: 'i' } });
     if (!lookup) {
       res
         .status(400)

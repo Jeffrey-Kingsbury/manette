@@ -71,7 +71,6 @@ const Ticket = () => {
                     setUid(uid)
                     setAttachments(res.attachments);
                     setStatus(status);
-                    console.log(uid)
                 })
         };
         getData();
@@ -298,7 +297,6 @@ const Ticket = () => {
                                         <FileNames>
                                             {
                                                 attachments.map(e => {
-                                                    console.log(e.slice(-3))
                                                     if (e.slice(-3) === "jpg") {
 
                                                         return <AttachmentImage id={e} key={e} src={`/uploads/${uid}/${e}`} onClick={() => {

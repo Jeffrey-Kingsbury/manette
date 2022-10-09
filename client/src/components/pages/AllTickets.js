@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
+import Loading from "../Loading";
 
 const AllBugs = () => {
     const [ticketData, setTicketData] = useState(false);
@@ -25,6 +26,7 @@ const AllBugs = () => {
     return (
         <Wrapper>
             <TicketContainer>
+              {!ticketData && <Loading/>}
                 {ticketData &&
                     ticketData.map((e) => {
                         return (
@@ -55,7 +57,10 @@ const AllBugs = () => {
                         );
                     })}
             </TicketContainer>
-            <FilterContainer>Filters</FilterContainer>
+            <FilterContainer>
+              {!ticketData && <Loading/>}
+              {ticketData && "Filters"}
+            </FilterContainer>
         </Wrapper>
     );
 };

@@ -1,19 +1,22 @@
+import { useNavigate } from "react-router";
+import { useLocation } from "react-router-dom";
+import { useState, useContext, useEffect } from "react";
 import styled from "styled-components";
 import logo from "../../images/manette_logo.png";
 import { AiFillSetting } from "react-icons/ai";
 import { GiBugleCall } from "react-icons/gi";
-import { useNavigate } from "react-router";
 import SettingsDropdown from '../inputs/SettingsDropdown';
-import { useState, useContext, useEffect } from "react";
 import { userContext } from "../../UserContext";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [settingsActive, setSettingsActive] = useState(false);
   const { currentUserData } = useContext(userContext);
+  
   const sendShout = () => {
     const shout = prompt("What would you like to shout?");
-    if (shout.trim().length > 0) {
+    if (shout && shout.trim().length > 0) {
       fetch('/shout', {
         method: "post",
         headers: { "content-type": "application/json" },
@@ -28,12 +31,14 @@ const Header = () => {
           }
         )
       })
-      navigate(0);
+      if(location.pathname === '/') navigate(0);
     }
   }
 
   return (
     <Wrapper>
+    {currentUserData &&
+      <>
       <Logo
         alt="Manette Logo"
         src={logo}
@@ -43,9 +48,10 @@ const Header = () => {
         <NewIssueItem onClick={() => { navigate('/new') }}>New ticket</NewIssueItem>
         <NaigationItem onClick={() => { navigate('/') }}>Dashboard</NaigationItem>
         <NaigationItem onClick={() => { navigate('/alltickets') }}>All tickets</NaigationItem>
+        { currentUserData.role === "admin" &&<NaigationItem onClick={() => { navigate('/admin') }}>Administration</NaigationItem>}
       </NavigationWrapper>
 
-      <Shout onClick={() => { sendShout() }}><p>Shout</p><GiBugleCall size={45} fill="purple" /></Shout>
+      { currentUserData.role === "admin" && <Shout onClick={() => { sendShout() }}><p>Shout</p><GiBugleCall size={45} fill="purple" /></Shout> }
 
       <SettingsWrapper>
         <UserDataWrapper>
@@ -80,6 +86,8 @@ const Header = () => {
         }
 
       </SettingsWrapper>
+      </>
+    }
     </Wrapper>
   );
 };

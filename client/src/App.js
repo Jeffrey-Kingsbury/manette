@@ -9,6 +9,7 @@ import Header from "./components/pages/Header";
 import NewBug from "./components/pages/NewBug";
 import AllTickets from "./components/pages/AllTickets";
 import Ticket from "./components/pages/Ticket";
+import Admin from "./components/pages/Admin";
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<><Header /><Dashboard /></>} />
+            <Route path="/admin" element={<><Header /><Admin /></>} />
             <Route path="/new" element={<><Header /> <NewBug /></>} />
             <Route path="/alltickets" element={<><Header /> <AllTickets /></>} />
             <Route path="/ticket/:ticketId" element={<><Header /> <Ticket /></>} />

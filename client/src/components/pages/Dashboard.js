@@ -10,19 +10,21 @@ const Dashboard = () => {
   const { userAuthenticated, validate, currentUserData } = useContext(userContext);
   const [userOpenTickets, setUserOpenTickets] = useState(false);
   useEffect(() => {
-    validate();
+    validate().then(e => {
+      const getTickets = async () => {
+        await fetch(`/getalltickets/user/${e.username}`)
+          .then((res) => res.json())
+          .then((res) => {
+            if (res.status === 200) {
+              setUserOpenTickets(res.data);
+            }
+          });
+  
+        }
+        getTickets();
+    });
 
-    const getTickets = async () => {
-      await fetch(`/getalltickets/user/${currentUserData.username}`)
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.status === 200) {
-            setUserOpenTickets(res.data);
-          }
-        });
 
-      }
-      getTickets();
 
 
   }, []);
@@ -37,7 +39,9 @@ const Dashboard = () => {
             <YourBugsWrapper>
               <Title>Your open tickets</Title>
               <YouBugsContainer>
-                {Object.keys(userOpenTickets).map(e =>{
+                {
+                  userOpenTickets && currentUserData && 
+                  Object.keys(userOpenTickets).map(e =>{
                   if(userOpenTickets[e].status !== 'closed'){
                     return <YourBugsIndividualWrapper key={userOpenTickets[e].ticketId} href={`/ticket/${userOpenTickets[e].ticketId}`}>
                       <YourBugsIndividualIdContainer>
@@ -51,6 +55,7 @@ const Dashboard = () => {
                     </YourBugsIndividualWrapper>
                   }
                 })}
+                {!userOpenTickets && currentUserData && "Nothing to see here yet."}
 
               </YouBugsContainer>
             </YourBugsWrapper>

@@ -21,7 +21,7 @@ const UserContext = ({ children }) => {
                 }
                 setCurrentUserData(res.currentUserData.profile);
                 setUserAuthenticated(true);
-                return true;
+                return res.currentUserData.profile;
             });
     };
 
