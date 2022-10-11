@@ -76,6 +76,24 @@ const Ticket = () => {
         getData();
     }, [projectData]);
 
+
+    const handleExport = () => {
+        const rows = [
+            ["Project", "department", "assignee", "platform", "severity", "component", "summary", "steps", "details", "notes", "reporter", "uid", "status"],
+            [project, department, assignee, platform.join(""), severity, component, summary.replace(/,/gm, "-"), str.replace(/(\r\n|\n|\r|,)/gm, ""), details.replace(/(\r\n|\n|\r|,)/gm, ""), notes.replace(/(\r\n|\n|\r|,)/gm, ""), reporter, uid, status]
+        ];
+
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + rows.map(e => e.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `${ticketId}_export.csv`);
+        document.body.appendChild(link);
+        link.click();
+    };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(false);
@@ -117,225 +135,238 @@ const Ticket = () => {
         <Wrapper>
             <Container>
 
-                    <>
-                        <Title>{ticketId}</Title>
-                        <Form id="form" onSubmit={(e) => handleSubmit(e)}>
-                            {error &&
-                                <AfterSubMessage>
-                                    <Title style={{ backgroundColor: "#F591CD" }}>Error</Title>
-                                    <ErrorMessage>ERROR</ErrorMessage>
-                                </AfterSubMessage>
-                            }
-                            {!selectedProject && <Loading />}
-                            {project && projectData && allUserData && (
-                                <>
-                                    <Row>
-                                        <Col>
-                                            Reporter: {reporter}
-                                        </Col>
-                                        <Col>
-                                            <Label>Status</Label>
-                                            <Select disabled={!editing} name="status" defaultValue={status} onChange={(e) => { setStatus(e.target.value); }}>
-                                                <Option value={"new"}>New</Option>
-                                                <Option value={"open"}>Open</Option>
-                                                <Option value={"resolved"}>Resolved</Option>
-                                                <Option value={"feedback"}>Feedback required</Option>
-                                                <Option value={"waived"}>Waived</Option>
-                                                <Option value={"closed"}>Closed</Option>
-                                            </Select>
-                                        </Col>
-                                        <Col>
-                                            Edit:
-                                            <input type="checkbox" onChange={() => { setEditing(!editing) }} />
+                <>
+                    <Title>{ticketId}</Title>
+                    <Form id="form" onSubmit={(e) => handleSubmit(e)}>
+                        {error &&
+                            <AfterSubMessage>
+                                <Title style={{ backgroundColor: "#F591CD" }}>Error</Title>
+                                <ErrorMessage>ERROR</ErrorMessage>
+                            </AfterSubMessage>
+                        }
+                        {!selectedProject && <Loading />}
+                        {project && projectData && allUserData && (
+                            <>
+                                <Row>
+                                    <Col>
+                                        Reporter: {reporter}
+                                    </Col>
+                                    <Col>
+                                        <Label>Status</Label>
+                                        <Select disabled={!editing} name="status" defaultValue={status} onChange={(e) => { setStatus(e.target.value); }}>
+                                            <Option value={"new"}>New</Option>
+                                            <Option value={"open"}>Open</Option>
+                                            <Option value={"resolved"}>Resolved</Option>
+                                            <Option value={"feedback"}>Feedback required</Option>
+                                            <Option value={"waived"}>Waived</Option>
+                                            <Option value={"closed"}>Closed</Option>
+                                        </Select>
+                                    </Col>
+                                    <Col>
+                                        Edit:
+                                        <input type="checkbox" onChange={() => { setEditing(!editing) }} />
 
-                                        </Col>
-
-                                    </Row>
-                                    <Row>
-                                        <Col>
-                                            <Label>Project</Label>
-                                            <Select disabled={!editing} name="project" defaultValue={project} onChange={(e) => { setSelectedProject(e.target.value); }}>
-                                                {projectNames.map((e, i) => {
-                                                    return (
-                                                        <Option value={e} key={e}>
-                                                            {e}
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Col>
-
-                                        <Col>
-                                            <Label>Department</Label>
-                                            <Select disabled={!editing} name="department" defaultValue={department} onChange={(e) => { setDepartment(e.target.value); }} required>
-                                                <Option value={null}></Option>
-                                                {projectData[selectedProject]["departments"].map((e) => {
-                                                    return (
-                                                        <Option value={e} key={e}>
-                                                            {e}
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Col>
-
-                                        <Col>
-                                            <Label>Assignee</Label>
-                                            <Select disabled={!editing} name="asignee" defaultValue={assignee} onChange={(e) => { setAssignee(e.target.value); }} required>
-                                                <Option value={null}></Option>
-                                                {allUserData.map((e) => {
-                                                    return (
-                                                        <Option value={e.username} key={e.username}>
-                                                            {e.username} - {e.firstName} {e.lastName} ({e.role})
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Col>
-                                    </Row>
-
-                                    <Row>
-                                        <Col>
-                                            <Label>Platform</Label>
-                                            <Select disabled={!editing} multiple name="platform" style={{ height: "150px" }} defaultValue={platform} onChange={(e) => {
-                                                const options = e.target.options;
-                                                const filtered = []
-                                                Object.keys(options).forEach((i) => {
-                                                    if (options[i].selected === true) {
-                                                        filtered.push(options[i].value)
-                                                    };
-                                                })
-                                                setPlatform(filtered);
-                                            }} required>
-                                                {projectData[selectedProject]["platforms"].map((e) => {
-                                                    return (
-                                                        <Option value={e} key={e}>
-                                                            {e}
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Col>
-
-                                        <Col>
-                                            <Label>Severity</Label>
-                                            <Select disabled={!editing} name="severity" defaultValue={severity} onChange={(e) => { setSeverity(e.target.value); }} required>
-                                                <Option value={null}></Option>
-                                                {projectData[selectedProject]["severities"].map((e) => {
-                                                    return (
-                                                        <Option value={e} key={e}>
-                                                            {e}
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Col>
-
-                                        <Col>
-                                            <Label>Component</Label>
-                                            <Select disabled={!editing} name="component" defaultValue={component} onChange={(e) => { setComponent(e.target.value); }} required>
-                                                <Option value={null}></Option>
-                                                {projectData[selectedProject]["components"].map((e) => {
-                                                    return (
-                                                        <Option value={e} key={e}>
-                                                            {e}
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Col>
-                                    </Row>
-
-                                    <Input
-                                        name="summary"
-                                        type="text"
-                                        icon="summary"
-                                        label="Summary"
-                                        placeholder="[Platform][Build][Location] - [Summary]"
-                                        width="600px"
-                                        setValue={setSummary}
-                                        required={true}
-                                        value={summary}
-                                        disabled={!editing}
+                                    </Col>
+                                    <Col>
+                                        
+                                        <ColorButton
+                                        color="#A691DB"
+                                        text="Export CSV"
+                                        textColor="white"
+                                        type="submit"
+                                        width="100%"
+                                        height="3.5rem"
+                                        func={()=>{handleExport()}}
                                     />
 
-                                    <Col>
-                                        <Label>Steps to reproduce</Label>
-                                        <TextArea disabled={!editing} name="str" height="100px" value={str} onChange={e => setStr(e.target.value)} />
-                                    </Col>
-                                    <Col>
-                                        <Label>Details</Label>
-                                        <TextArea disabled={!editing} name="details" height="300px" value={details} onChange={e => setDetails(e.target.value)} />
                                     </Col>
 
+                                </Row>
+                                <Row>
                                     <Col>
-                                        <Label>Notes</Label>
-                                        <TextArea disabled={!editing} name="notes" height="100px" value={notes} onChange={e => setNotes(e.target.value)} />
+                                        <Label>Project</Label>
+                                        <Select disabled={!editing} name="project" defaultValue={project} onChange={(e) => { setSelectedProject(e.target.value); }}>
+                                            {projectNames.map((e, i) => {
+                                                return (
+                                                    <Option value={e} key={e}>
+                                                        {e}
+                                                    </Option>
+                                                );
+                                            })}
+                                        </Select>
                                     </Col>
 
                                     <Col>
+                                        <Label>Department</Label>
+                                        <Select disabled={!editing} name="department" defaultValue={department} onChange={(e) => { setDepartment(e.target.value); }} required>
+                                            <Option value={null}></Option>
+                                            {projectData[selectedProject]["departments"].map((e) => {
+                                                return (
+                                                    <Option value={e} key={e}>
+                                                        {e}
+                                                    </Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Col>
 
-                                        {editing &&
-                                            <>
-                                                <Label>Attachments - Allowed types: [jpeg, mp4, .dmp, .txt, .pdf]</Label>
-                                                <CustomFileUpload htmlFor="newAttachments">
-                                                    <MdOutlineDriveFolderUpload size={30} />Upload
-                                                </CustomFileUpload>
-                                                <FileUpload id="newAttachments" name="newAttachments" type="file" accept="image/jpeg, video/mp4, .dmp, .txt, .pdf" multiple onChange={(e) => { setNewAttachments(e.target.files) }} />
-                                                <Label>New attachments:</Label>
-                                                <FileNames>
-                                                    {
-                                                        Object.keys(newAttachments).map(e => {
-                                                            return <Files key={e}><AiOutlineFile size={30} />{newAttachments[e].name}</Files>
-                                                        })
-                                                    }
-                                                </FileNames>
-                                            </>
-                                        }
+                                    <Col>
+                                        <Label>Assignee</Label>
+                                        <Select disabled={!editing} name="asignee" defaultValue={assignee} onChange={(e) => { setAssignee(e.target.value); }} required>
+                                            <Option value={null}></Option>
+                                            {allUserData.map((e) => {
+                                                return (
+                                                    <Option value={e.username} key={e.username}>
+                                                        {e.username} - {e.firstName} {e.lastName} ({e.role})
+                                                    </Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Col>
+                                </Row>
 
-                                        <Label>Attachments:</Label>
-                                        <FileNames>
-                                            {
-                                                attachments.map(e => {
-                                                    if (e.slice(-3) === "jpg") {
+                                <Row>
+                                    <Col>
+                                        <Label>Platform</Label>
+                                        <Select disabled={!editing} multiple name="platform" style={{ height: "150px" }} defaultValue={platform} onChange={(e) => {
+                                            const options = e.target.options;
+                                            const filtered = []
+                                            Object.keys(options).forEach((i) => {
+                                                if (options[i].selected === true) {
+                                                    filtered.push(options[i].value)
+                                                };
+                                            })
+                                            setPlatform(filtered);
+                                        }} required>
+                                            {projectData[selectedProject]["platforms"].map((e) => {
+                                                return (
+                                                    <Option value={e} key={e}>
+                                                        {e}
+                                                    </Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Col>
 
-                                                        return <AttachmentImage id={e} key={e} src={`/uploads/${uid}/${e}`} onClick={() => {
-                                                            if (!editing) {
-                                                                window.open(`http://localhost:8000/uploads/${uid}/${e}`, '_blank')
-                                                            } else {
-                                                                deleteAttachment(e);
-                                                            }
+                                    <Col>
+                                        <Label>Severity</Label>
+                                        <Select disabled={!editing} name="severity" defaultValue={severity} onChange={(e) => { setSeverity(e.target.value); }} required>
+                                            <Option value={null}></Option>
+                                            {projectData[selectedProject]["severities"].map((e) => {
+                                                return (
+                                                    <Option value={e} key={e}>
+                                                        {e}
+                                                    </Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Col>
+
+                                    <Col>
+                                        <Label>Component</Label>
+                                        <Select disabled={!editing} name="component" defaultValue={component} onChange={(e) => { setComponent(e.target.value); }} required>
+                                            <Option value={null}></Option>
+                                            {projectData[selectedProject]["components"].map((e) => {
+                                                return (
+                                                    <Option value={e} key={e}>
+                                                        {e}
+                                                    </Option>
+                                                );
+                                            })}
+                                        </Select>
+                                    </Col>
+                                </Row>
+
+                                <Input
+                                    name="summary"
+                                    type="text"
+                                    icon="summary"
+                                    label="Summary"
+                                    placeholder="[Platform][Build][Location] - [Summary]"
+                                    width="600px"
+                                    setValue={setSummary}
+                                    required={true}
+                                    value={summary}
+                                    disabled={!editing}
+                                />
+
+                                <Col>
+                                    <Label>Steps to reproduce</Label>
+                                    <TextArea disabled={!editing} name="str" height="100px" value={str} onChange={e => setStr(e.target.value)} />
+                                </Col>
+                                <Col>
+                                    <Label>Details</Label>
+                                    <TextArea disabled={!editing} name="details" height="300px" value={details} onChange={e => setDetails(e.target.value)} />
+                                </Col>
+
+                                <Col>
+                                    <Label>Notes</Label>
+                                    <TextArea disabled={!editing} name="notes" height="100px" value={notes} onChange={e => setNotes(e.target.value)} />
+                                </Col>
+
+                                <Col>
+
+                                    {editing &&
+                                        <>
+                                            <Label>Attachments - Allowed types: [jpeg, mp4, .dmp, .txt, .pdf]</Label>
+                                            <CustomFileUpload htmlFor="newAttachments">
+                                                <MdOutlineDriveFolderUpload size={30} />Upload
+                                            </CustomFileUpload>
+                                            <FileUpload id="newAttachments" name="newAttachments" type="file" accept="image/jpeg, video/mp4, .dmp, .txt, .pdf" multiple onChange={(e) => { setNewAttachments(e.target.files) }} />
+                                            <Label>New attachments:</Label>
+                                            <FileNames>
+                                                {
+                                                    Object.keys(newAttachments).map(e => {
+                                                        return <Files key={e}><AiOutlineFile size={30} />{newAttachments[e].name}</Files>
+                                                    })
+                                                }
+                                            </FileNames>
+                                        </>
+                                    }
+
+                                    <Label>Attachments:</Label>
+                                    <FileNames>
+                                        {
+                                            attachments.map(e => {
+                                                if (e.slice(-3) === "jpg") {
+
+                                                    return <AttachmentImage id={e} key={e} src={`/uploads/${uid}/${e}`} onClick={() => {
+                                                        if (!editing) {
+                                                            window.open(`http://localhost:8000/uploads/${uid}/${e}`, '_blank')
+                                                        } else {
+                                                            deleteAttachment(e);
                                                         }
-                                                        } crossOrigin='anonymous' />
-                                                    } else {
-                                                        return <a key={e} id={e} target={!editing ? "_blank" : ""} download={!editing} href={!editing ? `http://localhost:8000/uploads/${uid}/${e}` : ""} onClick={() => {
-                                                            if (!editing) {
-                                                                window.open(`http://localhost:8000/uploads/${uid}/${e}`, '_blank')
-                                                            } else {
-                                                                deleteAttachment(e);
-                                                            }
-                                                        }}>{e}</a>
                                                     }
-                                                })
-                                            }
-                                        </FileNames>
-                                    </Col>
+                                                    } crossOrigin='anonymous' />
+                                                } else {
+                                                    return <a key={e} id={e} target={!editing ? "_blank" : ""} download={!editing} href={!editing ? `http://localhost:8000/uploads/${uid}/${e}` : ""} onClick={() => {
+                                                        if (!editing) {
+                                                            window.open(`http://localhost:8000/uploads/${uid}/${e}`, '_blank')
+                                                        } else {
+                                                            deleteAttachment(e);
+                                                        }
+                                                    }}>{e}</a>
+                                                }
+                                            })
+                                        }
+                                    </FileNames>
+                                </Col>
 
-                                    <ButtonWrapper>
-                                        <ColorButton
-                                            color="#A691DB"
-                                            text="Submit"
-                                            textColor="white"
-                                            type="submit"
-                                            width="50%"
-                                            height="3.5rem"
-                                            disabled={!editing}
-                                        />
-                                    </ButtonWrapper>
-                                </>
-                            )}
-                        </Form>
-                    </>
+                                <ButtonWrapper>
+                                    <ColorButton
+                                        color="#A691DB"
+                                        text="Submit"
+                                        textColor="white"
+                                        type="submit"
+                                        width="50%"
+                                        height="3.5rem"
+                                        disabled={!editing}
+                                    />
+                                </ButtonWrapper>
+                            </>
+                        )}
+                    </Form>
+                </>
             </Container>
         </Wrapper>
     );
