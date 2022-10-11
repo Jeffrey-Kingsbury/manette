@@ -57,10 +57,6 @@ const AllBugs = () => {
                         );
                     })}
             </TicketContainer>
-            <FilterContainer>
-              {!ticketData && <Loading/>}
-              {ticketData && "Filters"}
-            </FilterContainer>
         </Wrapper>
     );
 };
