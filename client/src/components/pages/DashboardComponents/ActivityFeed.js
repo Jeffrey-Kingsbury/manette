@@ -46,9 +46,9 @@ const ActivityFeed = () => {
 };
 
 const Wrapper = styled.div`
-width: 90%;
+width: 50%;
 margin: 0 auto;
-height: 40%;
+height: 80%;
 background-color: white;
 border-radius: 15px;
 box-shadow: 1px 5px 15px 5px rgba(0,0,0,0.3);

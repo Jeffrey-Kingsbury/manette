@@ -76,13 +76,8 @@ const sendMail = async (req, res) => {
 const handleSignup = async (req, res) => {
   const client = new MongoClient(MONGO_URI, options);
   const db = client.db('Manette');
-
-  const user = req.body.username;
-  const pass = req.body.password;
-  const { email } = req.body;
-  const { firstName } = req.body;
-  const { lastName } = req.body;
-  const { role } = req.body;
+  const { user, pass, email, firstName, lastName, role } = req.body;
+  res.clearCookie('token');
 
   // If the info is missing (Which shouldn't be possible but just in case)
   if (!user || !pass || !email || !firstName || !lastName) {
@@ -91,7 +86,6 @@ const handleSignup = async (req, res) => {
   }
 
   const profile = {
-    verifiedEmail: false,
     role: role || 'analyst',
     firstName,
     lastName,
@@ -134,21 +128,6 @@ const handleSignup = async (req, res) => {
         .status(400)
         .json({ status: 400, message: 'An error occurred, please try again.' });
       return;
-    }
-
-    try {
-      // send auth code.
-      // Hard coded demo.manette.ca. This needs to be changed pre-release to reflect the correct subdomains. (STRETCH GOAL)
-      await transporter.sendMail({
-        from: NODEMAILERU,
-        to: email,
-        subject: 'Manette - email verification',
-        text: 'You have been invited to demo.manette.ca. Sign in to complete your profile!',
-        html: `You have been invited to <a href="demo.manette.ca" target="_blank">demo.manette.ca</a>. Sign in to complete your profile!`,
-      });
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(err);
     }
 
     res.status(200).json({ status: 200, success: true });
@@ -402,7 +381,87 @@ const updateUserData = async (req, res) => {
   }
 };
 
+const sendInvite = async (req, res) => {
+  const client = new MongoClient(MONGO_URI, options);
+  const db = client.db('Manette');
+  const { email, role } = req.body;
+
+  try {
+    // Connect to mongo
+    await client.connect();
+
+    // Find the user based on email.
+    const lookupEmail = await db
+      .collection('users')
+      .findOne({ email: { $regex: new RegExp(email), $options: 'i' } });
+
+    // If nothing is found, this returns null. Otherwise, throw an error because the user or email exist already.
+    if (lookupEmail) {
+      res.status(400).json({
+        status: 400,
+        message: 'That email already exists.',
+      });
+      return;
+    }
+
+    const token = jwt.sign(
+      {
+        profile: {
+          // eslint-disable-next-line object-shorthand
+          email: email,
+          // eslint-disable-next-line object-shorthand
+          role: role,
+        },
+      },
+      process.env.JWTPRIVATE
+    );
+
+    res.status(200).json({ status: 200, success: true });
+    // send auth code.
+    // Hard coded demo.manette.ca. This needs to be changed pre-release to reflect the correct subdomains. (STRETCH GOAL)
+    await transporter.sendMail({
+      from: NODEMAILERU,
+      to: email,
+      subject: 'Manette - email verification',
+      text: `You have been invited to manette! Sign in to complete your profile! localhost:3000/newaccount/${token}`,
+      html: `You have been invited to <a href='localhost:3000/newaccount/${token}' target="_blank">Manette</a>. Sign in to complete your profile!
+      localhost:3000/newaccount/${token}
+      `,
+    });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+  }
+};
+
+const validateSignupToken = async (req, res) => {
+  const Token = req.params.token;
+
+  try {
+    jwt.verify(Token, process.env.JWTPRIVATE, async (err, decoded) => {
+      // if err -> either invalid or expired
+      if (err) {
+        res.status(400).json({
+          status: 400,
+          data: Token,
+          error:
+            'This link has expired. Please send a new password recovery request.',
+        });
+        return;
+      }
+
+      // if decoded -> correct token, allow password reset.
+      res.status(200).json({ status: 200, data: decoded.profile });
+    });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+    res.status(401).json({ status: 401, error: 'Auth token invalid.' });
+  }
+};
+
 module.exports = {
+  sendInvite,
   sendMail,
   handleLogin,
   handleSignup,
@@ -410,4 +469,5 @@ module.exports = {
   resetPassword,
   validateResetPassword,
   updateUserData,
+  validateSignupToken,
 };

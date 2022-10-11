@@ -10,6 +10,7 @@ import NewBug from "./components/pages/NewBug";
 import AllTickets from "./components/pages/AllTickets";
 import Ticket from "./components/pages/Ticket";
 import Admin from "./components/pages/Admin";
+import NewAccount from "./components/pages/NewAccount";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/alltickets" element={<><Header /> <AllTickets /></>} />
             <Route path="/ticket/:ticketId" element={<><Header /> <Ticket /></>} />
             <Route path="/resetpassword/:token" element={<ResetPassword />} />
+            <Route path="/newaccount/:token" element={<NewAccount />} />
           </Routes>
         </Wrapper>
 

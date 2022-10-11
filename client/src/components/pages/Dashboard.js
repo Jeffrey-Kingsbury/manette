@@ -5,6 +5,7 @@ import styled from "styled-components";
 import YourBugsGraph from "./DashboardComponents/YourBugsGraph";
 import AllBugsGraph from "./DashboardComponents/AllBugsGraph";
 import ActivityFeed from "./DashboardComponents/ActivityFeed";
+import Invite from "./DashboardComponents/Invite";
 
 const Dashboard = () => {
   const { userAuthenticated, validate, currentUserData } = useContext(userContext);
@@ -59,9 +60,18 @@ const Dashboard = () => {
 
               </YouBugsContainer>
             </YourBugsWrapper>
+              
 
             <RightSideWrapper>
+              <Row>
+            {currentUserData.role === 'admin' && 
+            <InviteUsersWrapper>
+              <Title>Invite users</Title>
+              <Invite />
+            </InviteUsersWrapper>
+            }
               <ActivityFeed />
+              </Row>
 
               <GraphWrapper>
                 <BugsGraphWrapper>
@@ -117,6 +127,27 @@ const YourBugsWrapper = styled.div`
   margin: 0 1rem;
   overflow: hidden;
 `;
+
+const Row = styled.div`
+display: flex;
+width: 100%;
+height: 100%;
+justify-content: center;
+`;
+
+const InviteUsersWrapper = styled.div`
+  width: 40%;
+  max-width: 700px;
+  height: 95%;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 1px 5px 15px 5px rgba(0, 0, 0, 0.3);
+  margin: 0 2.5rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+`;
+
 
 const YouBugsContainer = styled.div`
 width: 100%;

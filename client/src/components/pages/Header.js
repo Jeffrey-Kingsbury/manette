@@ -48,7 +48,6 @@ const Header = () => {
         <NewIssueItem onClick={() => { navigate('/new') }}>New ticket</NewIssueItem>
         <NaigationItem onClick={() => { navigate('/') }}>Dashboard</NaigationItem>
         <NaigationItem onClick={() => { navigate('/alltickets') }}>All tickets</NaigationItem>
-        { currentUserData.role === "admin" &&<NaigationItem onClick={() => { navigate('/admin') }}>Administration</NaigationItem>}
       </NavigationWrapper>
 
       { currentUserData.role === "admin" && <Shout onClick={() => { sendShout() }}><p>Shout</p><GiBugleCall size={45} fill="purple" /></Shout> }

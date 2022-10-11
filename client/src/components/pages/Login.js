@@ -55,20 +55,6 @@ const Login = () => {
                 </LogoWrapper>
 
                 <ErrorWrapper>
-                    {/* Any messages that would appear above the login go here. NOTE: Any errors will replace this message.*/}
-                    {!error && (
-                        <FadeIn transitionDuration={500}>
-                            <ErrorText demo={true}>
-                                For demo purposes:
-                                <br />
-                                <br />
-                                Username: DEMO
-                                <br />
-                                Password: Testpassword!
-                            </ErrorText>
-                        </FadeIn>
-                    )}
-
                     {/* Error messages to be displayed to the user. */}
                     {error && (
                         <FadeIn transitionDuration={500}>

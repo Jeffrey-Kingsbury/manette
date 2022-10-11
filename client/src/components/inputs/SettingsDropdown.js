@@ -11,13 +11,6 @@ const SettingsDropdown = ({ setSettingsActive }) => {
             <List>
                 <Option
                     onClick={() => {
-
-                    }}
-                >
-                    Profile
-                </Option>
-                <Option
-                    onClick={() => {
                         setSettingsActive(false);
                         handleLogout();
                     }}
@@ -33,7 +26,7 @@ const Wrapper = styled.div`
   width: 250px;
   background-color: white;
   position: absolute;
-  bottom: -110px;
+  bottom: -62px;
   left: 0px;
   z-index: 9999;
   border: 2px solid;

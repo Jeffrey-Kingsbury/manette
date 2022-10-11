@@ -14,6 +14,8 @@ const {
   resetPassword,
   validateResetPassword,
   updateUserData,
+  validateSignupToken,
+  sendInvite,
 } = require('./loginHandlers');
 const {
   newActivity,
@@ -70,6 +72,8 @@ app.get('/resetPassword/:token', validateResetPassword);
 app.get('/verifyToken', verification, (req, res) => {
   res.json({ token: true, currentUserData: res.locals.currentUserData });
 });
+// Verify the email and role from the admins signup invite.
+app.get('/verifysignup/:token', validateSignupToken);
 // Logout function. Removes the token from the FE. On re-render the user will be forced back to the login screen.
 app.get('/logout', (req, res) => {
   res.clearCookie('token');
@@ -102,6 +106,8 @@ app.post('/notifications', verification, newActivity);
 app.post('/newbug/:ticketId', verification, upload.any(), postNew);
 app.post('/updateticket/:ticketId', verification, upload.any(), updateTicket);
 app.post('/shout', verification, shout);
+// Invite users to create an account.
+app.post('/sendinvite', verification, sendInvite);
 
 // PATCH REQUESTS
 
