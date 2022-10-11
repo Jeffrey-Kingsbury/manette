@@ -7,10 +7,13 @@ import Input from "../../inputs/Input";
 const Invite = () => {
     const [emailValue, setEmailValue] = useState(false);
     const [roleValue, setRoleValue] = useState(false);
+    const [error, setError] = useState(false);
+
     const navigate = useNavigate();
 
     const handleInvite = async (e) => {
         e.preventDefault();
+        setError(false);
         await fetch("/sendinvite", {
             method: "POST",
             headers: {
@@ -27,14 +30,14 @@ const Invite = () => {
                 navigate(0);
             }
             else{
-                alert(res.mesage);
+                setError(res.message);
             }
         })
     };
 
     return (
         <Form onSubmit={(e) => { handleInvite(e) }}>
-
+            {error && <Error>{error}</Error>}
             <Label style={{ textDecoration: "underline" }}>Invite a new user</Label>
             <Input
                 type="email"
@@ -97,6 +100,13 @@ width: 50%;
 height: 2rem;
 border-radius: 15px;
 margin-bottom: 2rem;
+`;
+
+const Error = styled.h1`
+width: 100%;
+text-align: center;
+font-size: large;
+color:red;
 `;
 
 export default Invite;

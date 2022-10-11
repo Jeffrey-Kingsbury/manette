@@ -26,7 +26,15 @@ const NewAccount = () => {
         const validate = async () => {
             await fetch("/verifysignup/" + resetToken.token)
                 .then(res => res.json())
-                .then(res => setUserData(res.data));
+                .then(res => {
+                    if(res.status === 400){
+                        setError(res.error);
+                        setUserData(res.error);
+                    return;
+                    }
+                    setUserData(res.data)
+                    
+                });
         }
         validate()
     }, []);
@@ -113,7 +121,8 @@ const NewAccount = () => {
                             </FadeIn>
                         </ErrorWrapper>
                     }
-                    <Form onSubmit={(e) => { handleSubmit(e) }}>
+
+                   {!error && <Form onSubmit={(e) => { handleSubmit(e) }}>
                         <Input
                             type="text"
                             icon="user"
@@ -160,7 +169,7 @@ const NewAccount = () => {
                                 height="3.5rem"
                             />
                         </ButtonWrapper>
-                    </Form>
+                    </Form>}
                 </Container>}
         </Wrapper>
     )

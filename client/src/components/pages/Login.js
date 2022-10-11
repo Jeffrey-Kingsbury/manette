@@ -54,14 +54,15 @@ const Login = () => {
                     <LogoText>Manette</LogoText>
                 </LogoWrapper>
 
-                <ErrorWrapper>
                     {/* Error messages to be displayed to the user. */}
                     {error && (
+                <ErrorWrapper>
                         <FadeIn transitionDuration={500}>
                             <ErrorText> {error} </ErrorText>
                         </FadeIn>
-                    )}
                 </ErrorWrapper>
+                    )
+                    }
 
                 <LoginForm
                     onSubmit={(e) => {
@@ -130,7 +131,8 @@ const LoginWrapper = styled.div`
   border-radius: 15px;
   box-shadow: 0 0 10px 2px black;
   width: 400px;
-  height: 600px;
+  max-height: 600px;
+  padding-bottom: 1rem;
   background-color: white;
 `;
 

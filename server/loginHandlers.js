@@ -445,7 +445,7 @@ const validateSignupToken = async (req, res) => {
           status: 400,
           data: Token,
           error:
-            'This link has expired. Please send a new password recovery request.',
+            'The request token is incorrect. Please request a new link from the administrator.',
         });
         return;
       }
