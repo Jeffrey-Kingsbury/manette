@@ -20,28 +20,17 @@ Manette is a bug tracking application designed for the quality assurance domain.
 * Start the server with ```yarn dev```.
 
 #
-## Users will be able to:
+## Features:
 * Create tickets 
-* Edit tickets
-* Search
+* Edit tickets, add / remove attachments
 * Upload media (Images / video / .dmp / txt) 
 * Assign tickets
 * Create user roles with different permissions
-* Create simple profiles with avatars
 * Login / logout
+* SHOUT feature that shows a message to all users in the activity feed
 * Recover passwords via email
-* Create new projects with different permission levels (public / private)
-
-#
-## Stretch goals: 
-* 2FA 
-* Custom themes
-* Greater details in profiles
-* Adding comments to tickets
-* Tagging users in comments
-* Notifications
 * Progress tracking and analytics
-* Exporting individual ticket or whole project datas to CSV or PDF
+* Exporting individual ticket data to CSV
 * Custom severities 
 * Custom componenets (ex: UI/UX, Frontend, Backend) when creating tickets
 
