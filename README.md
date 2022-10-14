@@ -2,6 +2,9 @@
 ## Final Project for Concordia Bootcamp by Jeffrey Kingsbury
 
 Manette is a bug tracking application designed for the quality assurance domain.
+
+<img src="./img/ManetteLogin.png" />
+
 #
 ### Getting started:
 
@@ -52,4 +55,20 @@ Manette is a bug tracking application designed for the quality assurance domain.
 * UUID
 * JsonWebToken
 
+#
+### Images
+## Login Screen
+<img src="./img/ManetteLogin.png" />
 
+#
+## Forgot password modal
+<img src="./img/forgotPassword.png" />
+
+#
+## Dashboard
+<img src="./img/dashboard.png" />
+
+#
+## Ticket Creation
+<img src="./img/ticket1.png" />
+<img src="./img/ticket2.png" />
